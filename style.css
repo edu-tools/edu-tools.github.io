@@ -142,14 +142,19 @@ body {
 .loop-container {
     display: flex;
     align-items: center;
+    width: 100%;
+    justify-content: flex-end;
+    margin-bottom: 10px;
 }
 
-#loopCheckbox {
+.loop-container input {
     margin-left: 10px;
 }
 
-
-
+.select-pen-container {
+    display: flex;
+    flex-direction: row;
+}
 
 .disable-select {
     user-select: none; /* supported by Chrome and Opera */

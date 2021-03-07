@@ -35,6 +35,10 @@ var writeSpeedText = document.getElementById("writeSpeedText");
 var loopCheckbox = document.getElementById("loopCheckbox");
 var undoButton = document.getElementById("undoButton");
 var redoButton = document.getElementById("redoButton");
+var penCheckbox = document.getElementById("penCheckbox");
+var quillCheckbox = document.getElementById("quillCheckbox");
+
+
 
 var ctx = canvasWriter.getContext('2d');
 var ctxMask = canvasWriterMask.getContext('2d');
@@ -68,9 +72,11 @@ redBlueLineImage.src = "red-blue-lines.png";
 let greyDottedLineImage = new Image();
 greyDottedLineImage.src = "grey-dotted-lines.png";
 
-let penImage = new Image();
-penImage.src = "quill.svg";
+let quillImage = new Image();
+quillImage.src = "quill.svg";
 
+let penImage = new Image();
+penImage.src = "pen.svg";
 
 let selectedBackground;
 
@@ -89,6 +95,9 @@ let selectedPenWidth = mediumPenWidth;
 ctx.lineWidth = selectedPenWidth;
 ctx.lineCap = "round";
 let selectedPenColour = 'rgb(0, 0, 0)';
+
+let isShowingPen = true;
+let selectedPenImage = penImage;
 
 
 let mouseX = 0;
@@ -264,7 +273,10 @@ rewriteButton.onclick = async function()
                     ctx.beginPath();        
                     ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
                     ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
-                    ctxMask.drawImage(penImage, storedLines[i][j][0], storedLines[i][j][1] - penImage.height);
+                    if (isShowingPen)
+                    {
+                        ctxMask.drawImage(selectedPenImage, storedLines[i][j][2], storedLines[i][j][3] - selectedPenImage.height);
+                    }
                     ctx.stroke();   
             
                     await new Promise(r => setTimeout(r, 50 / speedMultiplier));
@@ -306,6 +318,39 @@ loopCheckbox.onchange = function()
     }
 }
 
+penCheckbox.onchange = function()
+{
+    if (penCheckbox.checked)
+    {
+        selectedPenImage = penImage;
+        isShowingPen = true;
+        quillCheckbox.checked = false;
+    }
+    else 
+    {
+        if (!quillCheckbox.check)
+        {
+            isShowingPen = false;
+        }
+    }
+}
+
+quillCheckbox.onchange = function()
+{
+    if (quillCheckbox.checked)
+    {
+        selectedPenImage = quillImage;
+        isShowingPen = true;
+        penCheckbox.checked = false;
+    }
+    else 
+    {
+        if (!penCheckbox.check)
+        {
+            isShowingPen = false;
+        }
+    }
+}
 
 // When mouse clicked, draws line on click and sets mouseHeld to true for 'mousemove' events. 
 document.addEventListener('touchstart', event => 

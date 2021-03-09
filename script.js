@@ -137,7 +137,7 @@ function resetcanvasWriter(ctx)
 {
     ctx.strokeStyle = selectedPageColour;
     ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
-    ctxMask.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
+    ctxMask.clearRect(0, 0, canvasWriter.width, canvasWriter.height);
     ctx.strokeStyle = selectedPenColour;
     ctx.drawImage(selectedBackground, 0, 0);
     isRewriting = false;

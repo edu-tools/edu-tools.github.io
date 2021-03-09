@@ -252,7 +252,7 @@ redoButton.onclick = function()
 rewriteButton.onclick = async function()
 {
     
-    if (!isRewriting)
+    if (!isRewriting && storedLines.length != 0)
     {
         isRewriting = true;
         

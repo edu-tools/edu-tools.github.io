@@ -3,6 +3,7 @@
     margin: 0;
 }
 
+
 body {
     display: flex;
     flex-direction: column;
@@ -14,21 +15,57 @@ body {
 .title-container {
     padding: 0;
     margin: 0;
-    padding-block: 40px;
+    padding-top: 20px;
+    padding-bottom: 10px;
     display: flex;
-    justify-content: center;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    flex-direction: column;
+    align-items: center;
     font-size: 30px;
     color: white;
-    background-color: blue;
+    background-color: royalblue;
+    white-space: nowrap;
 }
 
+.title-text {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    color: white;
+    text-shadow: 4px 4px blue;
+    padding-bottom: 10px;
+}
+
+.date-text {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    color: rgb(255, 208, 0);
+    text-shadow: 2px 2px black;
+    font-size: 26px;
+}
+
+button {
+    background-color: royalblue; /* Green */
+    border: solid 2px rgb(0, 0, 255);
+    border-radius: 10px;
+    color: white;
+    text-shadow: 2px 2px blue;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    outline: none;
+    cursor: pointer;
+}
+
+button:active {
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
 
 .main-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: 10px;
 }
 
 .writer-container {
@@ -36,6 +73,8 @@ body {
     overflow: hidden;  
     touch-action: none;
     position: relative;
+    flex-basis: 70%;
+    justify-content: center;
 }
 
 #writerMask
@@ -47,7 +86,7 @@ body {
 
 .pen-options {
     display: flex;
-    flex-basis: 2%;
+    flex-basis: 30%;
     flex-direction: column;
     padding-top: 2rem;
     flex-grow: 1;
@@ -62,7 +101,7 @@ body {
 
 .page-options {
     display: flex;
-    flex-basis: 2%;
+    flex-basis: 30%;
     flex-direction: column;
     padding-top: 2rem;
     flex-grow: 1;
@@ -71,10 +110,9 @@ body {
 }
 
 .page-options button {
-    padding-block: 3rem;
+    padding-block: 2.5rem;
     margin-bottom: 2rem;
     justify-content: space-around;
-
 }
 
 .controls-container {
@@ -92,6 +130,7 @@ body {
     flex-direction: column;
     align-items: center;
     align-content: center;
+    flex-basis: 20%;
 }
 
 #resetButton {
@@ -102,41 +141,102 @@ body {
 
 .undo-redo-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
 }
 
 .undo-redo-container button {
     padding-block: 10px;
+    margin-inline: 30px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 80%;
+    height: 20px;
+    border-radius: 50px;
+    border: 2px solid grey;
+    background: white;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+  
+.slider:hover {
+    opacity: 1;
+}
+  
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; 
+    border: 3px solid blue;
+    background: royalblue;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 50x;
+    height: 50px;
+    border-radius: 50%; 
+    background: royalblue;
+    border: 3px solid blue;
+    cursor: pointer;
 }
 
 .write-speed-container {
     display: flex;
+    flex-basis: 20%;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
 #writeSpeedText {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: blue;
+    text-shadow: 1px 1px white;
     padding: 20px;
 }
 
 .colour-picker-container {
     display: flex;
-    background-color: lightcyan;
+    background-color: rgb(139, 161, 226);
     padding: 3px;
     border-radius: 10px;
-    border: 4px solid grey;
+    border: 3px solid blue;
 }
 
 .rewrite-container {
     display: flex;
+    flex-basis: 20%;
     flex-direction: column;
     align-items: center;
 }
 
 #rewriteButton {
     padding-block: 10px;
+    padding-inline: 60px;
+    white-space: nowrap;
     margin-bottom: 10px;
+    background-color: darkblue;
+    color: white;
+    text-shadow: 2px 2px black;
+    border: 3px solid white;
+    font-size: 30px;
+    border-radius: 50px;
+}
+
+.checkboxes-container {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid blue;
+    border-radius: 12px;
+    padding-inline: 30px;
 }
 
 .loop-container {
@@ -144,11 +244,17 @@ body {
     align-items: center;
     width: 100%;
     justify-content: flex-end;
-    margin-bottom: 10px;
+    margin-block: 5px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 1px 1px white;   
+    color: blue;
 }
 
 .loop-container input {
-    margin-left: 10px;
+    margin-left: 20px;
 }
 
 .select-pen-container {

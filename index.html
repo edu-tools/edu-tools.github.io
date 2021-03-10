@@ -9,7 +9,8 @@
 
   <body>
     <div class="title-container disable-select">
-      <h1 class="title">Handwriting Repeater</h1>
+      <h1 class="title-text">Handwriting Repeater</h1>
+      <h1 class="date-text" id="dateText">DATE</h1>
     </div>
     <div class="main-container disable-select">
       <div class="pen-options">
@@ -38,7 +39,7 @@
         </div>
       </div>
       <div class="write-speed-container">
-        <input type="range" min="1" max="100" value="50" class="slider" id="speedSlider">
+        <input type="range" min="1" max="100" value="20" class="slider" id="speedSlider">
         <p id="writeSpeedText">Write Speed:</p>
         <div class="colour-picker-container">
         <canvas id="colourPickerCanvas"></canvas>
@@ -46,18 +47,20 @@
       </div>
       <div class="rewrite-container">
         <button id="rewriteButton">Re-write!</button>
-        <div class="loop-container">
-          <p id="loopText">Loop</p>
-          <input type="checkbox" id="loopCheckbox">
+        <div class="checkboxes-container">
+          <div class="loop-container">
+            <p id="loopText">Loop</p>
+            <input type="checkbox" id="loopCheckbox">
+          </div>
+          <div class="loop-container">
+            <p id="penText">Pen</p>
+            <input type="checkbox" id="penCheckbox" checked>
+          </div>
+          <div class="loop-container">
+            <p id="quillText">Quill</p>
+            <input type="checkbox" id="quillCheckbox">
+          </div> 
         </div>
-        <div class="loop-container">
-          <p id="penText">Pen</p>
-          <input type="checkbox" id="penCheckbox" checked>
-        </div>
-        <div class="loop-container">
-          <p id="quillText">Quill</p>
-          <input type="checkbox" id="quillCheckbox">
-        </div>        
       </div>
     </div>
 

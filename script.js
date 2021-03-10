@@ -4,6 +4,47 @@ var canvasWriter = document.getElementById("writer");
 // 
 var canvasWriterMask = document.getElementById("writerMask");
 
+let date = new Date();
+
+let weekday = new Array(7);
+weekday[0] = "Sunday";
+weekday[1] = "Monday";
+weekday[2] = "Tuesday";
+weekday[3] = "Wednesday";
+weekday[4] = "Thursday";
+weekday[5] = "Friday";
+weekday[6] = "Saturday";
+
+let month = new Array(12);
+month[0] = "January";
+month[1] = "February";
+month[2] = "March";
+month[3] = "April";
+month[4] = "May";
+month[5] = "June";
+month[6] = "July";
+month[7] = "August";
+month[8] = "September";
+month[9] = "October";
+month[10] = "November";
+month[11] = "December";
+
+let dateString = "";
+
+dateString += weekday[date.getDay()];
+dateString += ", ";
+
+let monthDay = date.getDate();
+monthDay = dateSuffix(monthDay);
+
+dateString += monthDay;
+dateString += " ";
+dateString += month[date.getMonth()];
+dateString += " ";
+dateString += date.getFullYear();
+
+
+dateText.innerHTML = dateString;
 
 // Selects colour picker canvasWriter and draws colour picker image
 var canvasColour = document.getElementById("colourPickerCanvas");
@@ -98,7 +139,7 @@ let selectedPenColour = 'rgb(0, 0, 0)';
 
 let isShowingPen = true;
 let selectedPenImage = penImage;
-
+//
 
 let mouseX = 0;
 let mouseY = 0;
@@ -111,17 +152,17 @@ let isLooping = false;
 let originX = 0;
 let originY = 0; 
 
+//
 let currentLine = [];
 let storedLines = [];
-
 let deletedLines = [];
-
+//
 
 let rewriteSpeed = speedSlider.value;
 
 let speedMultiplier = 0.1 * rewriteSpeed;
 
-writeSpeedText.textContent = "Write Speed: " + speedMultiplier;
+writeSpeedText.textContent = "Write Speed: " + speedMultiplier + ".0";
 
 function getMousePos(e)
 {
@@ -145,43 +186,118 @@ function resetcanvasWriter(ctx)
 }
 
 // Pen options buttons
+let selectedPenButton = 1;
+document.getElementById("mediumPenButton").innerHTML = "<u>Medium Pen</u>";
+
+
 smallPenButton.onclick = function()
 {
     selectedPenWidth = smallPenWidth;
+    selectedPenButton = 0;
+    selectPenButton();
 }
 mediumPenButton.onclick = function()
 {
     selectedPenWidth = mediumPenWidth;
+    selectedPenButton = 1;
+    selectPenButton();
 }
 largePenButton.onclick = function()
 {
     selectedPenWidth = largePenWidth;
+    selectedPenButton = 2;
+    selectPenButton();
+}
+
+function selectPenButton() 
+{
+    if (selectedPenButton == 0)
+    {
+        document.getElementById("smallPenButton").innerHTML = "<u>Small Pen</u>";
+        document.getElementById("mediumPenButton").innerHTML = "Medium Pen";
+        document.getElementById("largePenButton").innerHTML = "Large Pen";
+    }
+    else if (selectedPenButton == 1)
+    {
+        document.getElementById("smallPenButton").innerHTML = "Small Pen";
+        document.getElementById("mediumPenButton").innerHTML = "<u>Medium Pen</u>";
+        document.getElementById("largePenButton").innerHTML = "Large Pen";
+    }
+    else if (selectedPenButton == 2)
+    {
+        document.getElementById("smallPenButton").innerHTML = "Small Pen";
+        document.getElementById("mediumPenButton").innerHTML = "Medium Pen";
+        document.getElementById("largePenButton").innerHTML = "<u>Large Pen</u>";
+    }
 }
 
 // Page background buttons
+let selectedPageButton = 0;
+document.getElementById("backgroundButton1").innerHTML = "<u>Background 1</u>";
+
 backgroundButton1.onclick = function()
 {
     selectedBackground = blueLineImage;
     resetcanvasWriter(ctx);
     storedLines = [];
+    selectedPageButton = 0;
+    selectPageButton();
 }
 backgroundButton2.onclick = function()
 {
     selectedBackground = greyDottedLineImage;
     resetcanvasWriter(ctx);
     storedLines = [];
+    selectedPageButton = 1;
+    selectPageButton();
 }
 backgroundButton3.onclick = function()
 {
     selectedBackground = redBlueLineImage;
     resetcanvasWriter(ctx);
     storedLines = [];
+    selectedPageButton = 2;
+    selectPageButton();
 }
 backgroundButton4.onclick = function()
 {
     selectedBackground = greyLineImage;
     resetcanvasWriter(ctx);
     storedLines = [];
+    selectedPageButton = 3;
+    selectPageButton();
+}
+
+function selectPageButton() 
+{
+    if (selectedPageButton == 0)
+    {
+        document.getElementById("backgroundButton1").innerHTML = "<u>Background 1</u>";
+        document.getElementById("backgroundButton2").innerHTML = "Background 2";
+        document.getElementById("backgroundButton3").innerHTML = "Background 3";
+        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+    }
+    else if (selectedPageButton == 1)
+    {
+        document.getElementById("backgroundButton1").innerHTML = "Background 1";
+        document.getElementById("backgroundButton2").innerHTML = "<u>Background 2</u>";
+        document.getElementById("backgroundButton3").innerHTML = "Background 3";
+        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+    }
+    else if (selectedPageButton == 2)
+    {
+        document.getElementById("backgroundButton1").innerHTML = "Background 1";
+        document.getElementById("backgroundButton2").innerHTML = "Background 2";
+        document.getElementById("backgroundButton3").innerHTML = "<u>Background 3</u>";
+        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+    }
+    else if (selectedPageButton == 3)
+    {
+        document.getElementById("backgroundButton1").innerHTML = "Background 1";
+        document.getElementById("backgroundButton2").innerHTML = "Background 2";
+        document.getElementById("backgroundButton3").innerHTML = "Background 3";
+        document.getElementById("backgroundButton4").innerHTML = "<u>Background 4</u>";
+    }
 }
 
 // Bottom controls
@@ -193,10 +309,11 @@ resetButton.onclick = function()
 
 undoButton.onclick = function()
 {
-    if (!isRewriting && deletedLines.length < 100)
+    if (!isRewriting && deletedLines.length < 100 && storedLines.length > 0)
     {
+        console.log("Undo: " + storedLines.length);
+
         deletedLines.push(storedLines.pop());
-        console.log("Undo");
     
     
         ctx.fillStyle = selectedPageColour;
@@ -224,8 +341,10 @@ redoButton.onclick = function()
 {
     if (!isRewriting && deletedLines.length != 0)
     {
+        console.log("Redo: " + deletedLines.length);
+
         storedLines.push(deletedLines.pop());
-        console.log("Undo");
+
     
     
         ctx.strokeStyle = selectedPageColour;
@@ -526,4 +645,30 @@ function changePenColour(event)
         ctxColourPicker.fillRect(Math.floor(event.offsetX/36) * 36 + 2, 2, 32, 34);
         ctxColourPicker.drawImage(colourPickerImage, 0, 0);
     }
+}
+
+function dateSuffix(dayString)
+{
+    if (dayString.length == 2 && dayString[0] == '1')
+    {
+        return (dayString += "th");
+
+    }
+    else if (dayString[dayString.length - 1] == '1')
+    {
+        return (dayString += "st");
+    }
+    else if (dayString[dayString.length - 1] == '2')
+    {
+        return (dayString += "nd");
+    }
+    else if (dayString[dayString.length - 1] == '3')
+    {
+        return (dayString += "rd");
+    }
+    else
+    {
+        return (dayString += "th");
+    }
+
 }

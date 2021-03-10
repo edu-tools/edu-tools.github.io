@@ -84,8 +84,6 @@ var quillCheckbox = document.getElementById("quillCheckbox");
 var ctx = canvasWriter.getContext('2d');
 var ctxMask = canvasWriterMask.getContext('2d');
 
-console.log("LOADED\n");
-
 
 function mod(n, m) 
 {

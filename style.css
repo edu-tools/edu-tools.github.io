@@ -45,14 +45,14 @@ button {
     border: solid 2px rgb(0, 0, 255);
     border-radius: 10px;
     color: white;
-    text-shadow: 2px 2px blue;
+    text-shadow: 0.1vw 0.1vw blue;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
     padding: 10px 20px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 24px;
+    font-size: 1.2vw;
     outline: none;
     cursor: pointer;
 }
@@ -66,63 +66,65 @@ button:active {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-top: 30px;
 }
 
 .writer-container {
     display: flex;
-    overflow: hidden;  
     touch-action: none;
+    overflow: scroll;
     position: relative;
-    flex-basis: 70%;
-    justify-content: center;
+    flex-basis: 80%;
+    justify-content: flex-start;
 }
 
-#writerMask
-{
+
+#writerMask {
     display: flex;
+    touch-action: none;
     position: absolute;
-    overflow: hidden;
 }
 
 .pen-options {
     display: flex;
-    flex-basis: 30%;
+    flex-basis: 20%;
     flex-direction: column;
-    padding-top: 2rem;
     flex-grow: 1;
-    margin-inline: 2rem;
     white-space: nowrap;
+    width: 100%;
+    align-items: center;
+
 }
 
 .pen-options button {
-    padding-block: 3rem;
-    margin-bottom: 2rem;
+    padding-block: 2rem;
+    margin-block: 2rem;
+    width: 70%;
 }
 
 .page-options {
     display: flex;
-    flex-basis: 30%;
+    flex-basis: 20%;
     flex-direction: column;
-    padding-top: 2rem;
     flex-grow: 1;
     white-space: nowrap;
-    margin-inline: 2rem;
+    width: 100%;
+    align-items: center;
 }
 
 .page-options button {
-    padding-block: 2.5rem;
+    padding-block: 1.8rem;
     margin-bottom: 2rem;
     justify-content: space-around;
+    width: 70%;
+
 }
 
 .controls-container {
+    padding-block: 50px;
     padding-inline: 4rem;
     display: flex;
-    justify-content: space-between;
-}
-
-.controls-container button {
-    padding-inline: 20px;
+    justify-content: center;
 }
 
 .reset-do-container {
@@ -130,13 +132,13 @@ button:active {
     flex-direction: column;
     align-items: center;
     align-content: center;
-    flex-basis: 20%;
+    flex-basis: 25%;
 }
 
 #resetButton {
     padding: 20px;
     margin-bottom: 25px;
-    width: 100%;
+    width: 60%;
 }
 
 .undo-redo-container {
@@ -151,7 +153,7 @@ button:active {
 
 .slider {
     -webkit-appearance: none;
-    width: 80%;
+    width: 40%;
     height: 20px;
     border-radius: 50px;
     border: 2px solid grey;
@@ -188,7 +190,7 @@ button:active {
 
 .write-speed-container {
     display: flex;
-    flex-basis: 20%;
+    flex-basis: 50%;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -213,7 +215,7 @@ button:active {
 
 .rewrite-container {
     display: flex;
-    flex-basis: 20%;
+    flex-basis: 25%;
     flex-direction: column;
     align-items: center;
 }

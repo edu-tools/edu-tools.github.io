@@ -72,7 +72,7 @@ button:active {
 .writer-container {
     display: flex;
     touch-action: none;
-    overflow: scroll;
+    overflow-x: scroll;
     position: relative;
     flex-basis: 80%;
     justify-content: flex-start;
@@ -106,22 +106,20 @@ button:active {
     display: flex;
     flex-basis: 20%;
     flex-direction: column;
-    flex-grow: 1;
     white-space: nowrap;
     width: 100%;
     align-items: center;
 }
 
 .page-options button {
-    padding-block: 1.8rem;
+    padding-block: 2.4rem;
     margin-bottom: 2rem;
     justify-content: space-around;
     width: 70%;
-
 }
 
 .controls-container {
-    padding-block: 50px;
+    padding-block: 20px;
     padding-inline: 4rem;
     display: flex;
     justify-content: center;
@@ -136,9 +134,9 @@ button:active {
 }
 
 #resetButton {
-    padding: 20px;
+    padding-block: 20px;
     margin-bottom: 25px;
-    width: 60%;
+    width: 55%;
 }
 
 .undo-redo-container {
@@ -147,8 +145,7 @@ button:active {
 }
 
 .undo-redo-container button {
-    padding-block: 10px;
-    margin-inline: 30px;
+    margin-inline: 1vw;
 }
 
 .slider {
@@ -229,7 +226,7 @@ button:active {
     color: white;
     text-shadow: 2px 2px black;
     border: 3px solid white;
-    font-size: 30px;
+    font-size: 2vw;
     border-radius: 50px;
 }
 
@@ -238,7 +235,7 @@ button:active {
     flex-direction: column;
     border: 2px solid blue;
     border-radius: 12px;
-    padding-inline: 30px;
+    padding-inline: 2vw;
 }
 
 .loop-container {
@@ -246,11 +243,11 @@ button:active {
     align-items: center;
     width: 100%;
     justify-content: flex-end;
-    margin-block: 5px;
+    margin-block: 0.2vw;
 
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    font-size: 18px;
+    font-size: calc(12px + 0.2vw);
     text-shadow: 1px 1px white;   
     color: blue;
 }
@@ -259,10 +256,7 @@ button:active {
     margin-left: 20px;
 }
 
-.select-pen-container {
-    display: flex;
-    flex-direction: row;
-}
+
 
 .disable-select {
     user-select: none; /* supported by Chrome and Opera */

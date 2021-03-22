@@ -34,7 +34,7 @@ let dateString = "";
 dateString += weekday[date.getDay()];
 dateString += ", ";
 
-let monthDay = date.getDate();
+let monthDay = date.getDate().toString();
 monthDay = dateSuffix(monthDay);
 
 dateString += monthDay;

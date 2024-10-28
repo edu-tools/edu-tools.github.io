@@ -110,6 +110,8 @@ let redBlueLineImage = new Image();
 redBlueLineImage.src = "red-blue-lines.png";
 let greyDottedLineImage = new Image();
 greyDottedLineImage.src = "grey-dotted-lines.png";
+let squaresImage = new Image();
+squaresImage.src = "squares.png";
 
 let quillImage = new Image();
 quillImage.src = "quill.svg";
@@ -265,7 +267,14 @@ backgroundButton4.onclick = function()
     selectedPageButton = 3;
     selectPageButton();
 }
-
+backgroundButton5.onclick = function()
+{
+    selectedBackground = squaresImage;
+    resetcanvasWriter(ctx);
+    storedLines = [];
+    selectedPageButton = 4;
+    selectPageButton();
+}
 function selectPageButton() 
 {
     if (selectedPageButton == 0)
@@ -274,6 +283,7 @@ function selectPageButton()
         document.getElementById("backgroundButton2").innerHTML = "Background 2";
         document.getElementById("backgroundButton3").innerHTML = "Background 3";
         document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        document.getElementById("backgroundButton5").innerHTML = "Background 5";
     }
     else if (selectedPageButton == 1)
     {
@@ -281,6 +291,7 @@ function selectPageButton()
         document.getElementById("backgroundButton2").innerHTML = "<u>Background 2</u>";
         document.getElementById("backgroundButton3").innerHTML = "Background 3";
         document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        document.getElementById("backgroundButton5").innerHTML = "Background 5";
     }
     else if (selectedPageButton == 2)
     {
@@ -288,6 +299,7 @@ function selectPageButton()
         document.getElementById("backgroundButton2").innerHTML = "Background 2";
         document.getElementById("backgroundButton3").innerHTML = "<u>Background 3</u>";
         document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        document.getElementById("backgroundButton5").innerHTML = "Background 5";
     }
     else if (selectedPageButton == 3)
     {
@@ -295,6 +307,15 @@ function selectPageButton()
         document.getElementById("backgroundButton2").innerHTML = "Background 2";
         document.getElementById("backgroundButton3").innerHTML = "Background 3";
         document.getElementById("backgroundButton4").innerHTML = "<u>Background 4</u>";
+        document.getElementById("backgroundButton5").innerHTML = "Background 5";
+    }
+    else if (selectedPageButton == 4)
+    {
+        document.getElementById("backgroundButton1").innerHTML = "Background 1";
+        document.getElementById("backgroundButton2").innerHTML = "Background 2";
+        document.getElementById("backgroundButton3").innerHTML = "Background 3";
+        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        document.getElementById("backgroundButton5").innerHTML = "<u>Background 5</u>";
     }
 }
 

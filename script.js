@@ -59,11 +59,11 @@ colourPickerImage.addEventListener('load', event =>
     canvasColour.height = colourPickerImage.height;
     ctxColourPicker.drawImage(colourPickerImage, 0, 0);
 
-    ctxColourPicker.fillStyle = 'rgb(100,100,100)';
+    ctxColourPicker.fillStyle = colourArrayToRGBString([100,100,100]);
     ctxColourPicker.clearRect(0, 0, 1000, 1000)
     
     ctxColourPicker.fillRect(0, 0, 36, 38);
-    ctxColourPicker.fillStyle = 'rgb(135,206,250)';
+    ctxColourPicker.fillStyle = colourArrayToRGBString([135,206,250]);
     ctxColourPicker.fillRect(2, 2, 32, 34);
     ctxColourPicker.drawImage(colourPickerImage, 0, 0);
 });
@@ -74,6 +74,7 @@ var rewriteButton = document.getElementById("rewriteButton");
 var speedSlider = document.getElementById("speedSlider");
 var writeSpeedText = document.getElementById("writeSpeedText");
 var loopCheckbox = document.getElementById("loopCheckbox");
+var traceCheckbox = document.getElementById("traceCheckbox");
 var undoButton = document.getElementById("undoButton");
 var redoButton = document.getElementById("redoButton");
 var penCheckbox = document.getElementById("penCheckbox");
@@ -92,14 +93,14 @@ function mod(n, m)
 
 
 // Colours
-let defaultColour = 'rgb(240, 240, 240)';
+let defaultColour = colourArrayToRGBString([240, 240, 240]);
 
 let selectedPageColour = defaultColour;
 
 
 ctx.fillStyle = selectedPageColour;
 ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height)
-ctx.strokeStyle = 'rgb(100, 110, 10)';
+ctx.strokeStyle = colourArrayToRGBString([100, 110, 10]);
 
 // Load images
 let greyLineImage = new Image();
@@ -117,9 +118,7 @@ quillImage.src = "quill.svg";
 let penImage = new Image();
 penImage.src = "pen.svg";
 
-let selectedBackground;
-
-selectedBackground = blueLineImage;
+let selectedBackground = blueLineImage;
 
 
 selectedBackground.onload = () => { ctx.drawImage(selectedBackground, 0, 0); };
@@ -133,8 +132,9 @@ let selectedPenWidth = mediumPenWidth;
 
 ctx.lineWidth = selectedPenWidth;
 ctx.lineCap = "round";
-let selectedPenColour = 'rgb(0, 0, 0)';
+let selectedPenColour = [0, 0, 0];
 
+let isShowingTrace = false;
 let isShowingPen = true;
 let selectedPenImage = penImage;
 //
@@ -177,7 +177,7 @@ function resetcanvasWriter(ctx)
     ctx.strokeStyle = selectedPageColour;
     ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
     ctxMask.clearRect(0, 0, canvasWriter.width, canvasWriter.height);
-    ctx.strokeStyle = selectedPenColour;
+    ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
     ctx.drawImage(selectedBackground, 0, 0);
     isRewriting = false;
     deletedLines = [];
@@ -309,15 +309,13 @@ undoButton.onclick = function()
 {
     if (!isRewriting && deletedLines.length < 100 && storedLines.length > 0)
     {
-        console.log("Undo: " + storedLines.length);
-
         deletedLines.push(storedLines.pop());
     
     
         ctx.fillStyle = selectedPageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         ctx.drawImage(selectedBackground, 0, 0);
-        ctx.strokeStyle = selectedPenColour;
+        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
         ctx.lineWidth = selectedPenWidth;
 
         for (i = 0; i < storedLines.length; i++)
@@ -326,7 +324,7 @@ undoButton.onclick = function()
             {
                 ctx.beginPath();  
                 ctx.lineWidth = storedLines[i][j][4];
-                ctx.strokeStyle = storedLines[i][j][5];
+                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j][5]);
                 ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
                 ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
                 ctx.stroke();   
@@ -339,8 +337,6 @@ redoButton.onclick = function()
 {
     if (!isRewriting && deletedLines.length != 0)
     {
-        console.log("Redo: " + deletedLines.length);
-
         storedLines.push(deletedLines.pop());
 
     
@@ -348,7 +344,7 @@ redoButton.onclick = function()
         ctx.strokeStyle = selectedPageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         ctx.drawImage(selectedBackground, 0, 0);
-        ctx.strokeStyle = selectedPenColour;
+        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
         ctx.lineWidth = selectedPenWidth;
 
         for (i = 0; i < storedLines.length; i++)
@@ -356,7 +352,7 @@ redoButton.onclick = function()
             for(j = 0; j < storedLines[i].length; j++)
             {
                 ctx.lineWidth = storedLines[i][j][4];
-                ctx.strokeStyle = storedLines[i][j][5];
+                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j][5]);
                 ctx.beginPath();        
                 ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
                 ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
@@ -371,6 +367,14 @@ rewriteButton.onclick = async function()
     
     if (!isRewriting && storedLines.length != 0)
     {
+        gtag('event', 'activate-rewrite', {
+            'loop_on': isLooping,
+            'trace_on': isShowingTrace,
+            'selected_background': selectedBackground.src,
+            'show_pen': isShowingPen,
+            'write_speed_multiplier': speedMultiplier
+        });
+
         isRewriting = true;
         
         do 
@@ -378,16 +382,32 @@ rewriteButton.onclick = async function()
             ctx.strokeStyle = selectedPageColour;
             ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
             ctx.drawImage(selectedBackground, 0, 0);
-            ctx.strokeStyle = selectedPenColour;
-            ctx.lineWidth = selectedPenWidth;
-   
+            
+            if (isShowingTrace)
+            {
+                for (i = 0; i < storedLines.length; i++)
+                {
+                    for(j = 0; j < storedLines[i].length; j++)
+                    {
+                        ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
+                        ctx.lineWidth = storedLines[i][j][4];
+                        let baseColour = storedLines[i][j][5];
+                        ctx.strokeStyle = colourArrayToRGBString(faintColourArray(baseColour));
+                        ctx.beginPath();        
+                        ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
+                        ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
+                        ctx.stroke();
+                    }
+                }
+            }
+
             for (i = 0; i < storedLines.length; i++)
             {
                 for(j = 0; j < storedLines[i].length; j++)
                 {
                     ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
                     ctx.lineWidth = storedLines[i][j][4];
-                    ctx.strokeStyle = storedLines[i][j][5];
+                    ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j][5]);
                     ctx.beginPath();        
                     ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
                     ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
@@ -399,6 +419,8 @@ rewriteButton.onclick = async function()
             
                     await new Promise(r => setTimeout(r, 50 / speedMultiplier));
                 }
+
+                await new Promise(r => setTimeout(r, 500 / speedMultiplier));
             }
             
             ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
@@ -433,6 +455,18 @@ loopCheckbox.onchange = function()
     else
     {
         isLooping = false;
+    }
+}
+
+traceCheckbox.onchange = function()
+{
+    if (traceCheckbox.checked)
+    {
+        isShowingTrace = true;
+    }
+    else
+    {
+        isShowingTrace = false;
     }
 }
 
@@ -485,7 +519,7 @@ document.addEventListener('touchstart', event =>
         {
             deletedLines = [];
 
-            ctx.strokeStyle = selectedPenColour;
+            ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
             ctx.beginPath();        
             ctx.lineWidth = selectedPenWidth;
 
@@ -518,7 +552,7 @@ document.addEventListener('mousedown', event =>
             deletedLines = [];
 
             ctx.beginPath();   
-            ctx.strokeStyle = selectedPenColour;
+            ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
      
             ctx.lineWidth = selectedPenWidth;
 
@@ -566,14 +600,12 @@ document.addEventListener('touchmove', event =>
     {
         ctx.beginPath();        
         ctx.lineWidth = selectedPenWidth;
-        ctx.strokeStyle = selectedPenColour;
+        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
         ctx.moveTo(originX, originY);
         let bound = canvasWriter.getBoundingClientRect();
 
         mouseX = event.clientX - bound.left - canvasWriter.clientLeft;
         mouseY = event.clientY - bound.top - canvasWriter.clientTop;
-
-        //console.log("(", originX, ", ", originY, ") to (", mouseX, ", ", mouseY, ")");
 
         currentLine.push([originX, originY, mouseX, mouseY, selectedPenWidth, selectedPenColour]);
 
@@ -591,7 +623,7 @@ document.addEventListener('mousemove', event =>
 
     if (mouseHeld)
     {
-        ctx.strokeStyle = selectedPenColour;
+        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
         ctx.beginPath();        
         ctx.lineWidth = selectedPenWidth;
 
@@ -600,8 +632,6 @@ document.addEventListener('mousemove', event =>
 
         mouseX = event.clientX - bound.left - canvasWriter.clientLeft;
         mouseY = event.clientY - bound.top - canvasWriter.clientTop;
-
-        //console.log("(", originX, ", ", originY, ") to (", mouseX, ", ", mouseY, ")");
 
         currentLine.push([originX, originY, mouseX, mouseY, selectedPenWidth, selectedPenColour]);
 
@@ -633,16 +663,25 @@ function changePenColour(event)
     let pickedColour = Array.from(ctxColourPicker.getImageData(event.offsetX, colourPickerImage.height / 2, 1, 1).data);
     if (pickedColour.length != 0)
     {
-        selectedPenColour = 'rgb(' + pickedColour[0] + ',' + pickedColour[1] +  ',' + pickedColour[2] + ')'; 
-        console.log(selectedPenColour);
-        ctxColourPicker.fillStyle = 'rgb(100,100,100)';
+        selectedPenColour = pickedColour; 
+        ctxColourPicker.fillStyle = colourArrayToRGBString([100,100,100]);
         ctxColourPicker.clearRect(0, 0, 1000, 1000)
         
         ctxColourPicker.fillRect(Math.floor(event.offsetX/36) * 36, 0, 36, 38);
-        ctxColourPicker.fillStyle = 'rgb(135,206,250)';
+        ctxColourPicker.fillStyle = colourArrayToRGBString([135,206,250]);
         ctxColourPicker.fillRect(Math.floor(event.offsetX/36) * 36 + 2, 2, 32, 34);
         ctxColourPicker.drawImage(colourPickerImage, 0, 0);
     }
+}
+
+function colourArrayToRGBString(colourArray)
+{
+    return "rgb(" + colourArray[0] + "," + colourArray[1] + "," + colourArray[2] + ")";
+}
+
+function faintColourArray(colourArray)
+{
+    return colourArray.map(x => x + 3 * (255 - x) / 4);
 }
 
 function dateSuffix(dayString)

@@ -367,7 +367,7 @@ rewriteButton.onclick = async function()
     
     if (!isRewriting && storedLines.length != 0)
     {
-        gtag('event', 'activate-rewrite', {
+        gtag('event', 'activate_rewrite', {
             'loop_on': isLooping,
             'trace_on': isShowingTrace,
             'selected_background': selectedBackground.src,

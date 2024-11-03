@@ -16,8 +16,8 @@ body {
     display: flex;
     padding: 0;
     margin: 0;
-    padding-top: 20px;
-    padding-bottom: 10px;
+    padding-top: 1vh;
+    padding-bottom: 3vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,14 +30,14 @@ body {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     color: white;
     text-shadow: 4px 4px blue;
-    font-size: 3vw;
+    font-size: 5vh;
 }
 
 .date-text {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     color: rgb(255, 208, 0);
     text-shadow: 2px 2px black;
-    font-size: 1.5vw;
+    font-size: 3vh;
     text-decoration: underline;
     text-decoration-skip-ink: none;
 }
@@ -67,7 +67,7 @@ button:active {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: 30px;
+    padding-block: 20px;
 }
 
 .writer-container {

@@ -17,7 +17,7 @@ body {
     padding: 0;
     margin: 0;
     padding-top: 1vh;
-    padding-bottom: 3vh;
+    padding-bottom: 2vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,14 +30,15 @@ body {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     color: white;
     text-shadow: 4px 4px blue;
-    font-size: 5vh;
+    font-size: 2.5vw;
+    padding-block: 0.5vh;
 }
 
 .date-text {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
     color: rgb(255, 208, 0);
     text-shadow: 2px 2px black;
-    font-size: 3vh;
+    font-size: 1.3vw;
     text-decoration: underline;
     text-decoration-skip-ink: none;
 }
@@ -75,8 +76,9 @@ button:active {
     touch-action: none;
     overflow-x: scroll;
     position: relative;
-    flex-basis: 80%;
+    flex-basis: 60%;
     justify-content: flex-start;
+    max-width: fit-content;
 }
 
 
@@ -107,6 +109,7 @@ button:active {
     display: flex;
     flex-basis: 20%;
     flex-direction: column;
+    flex-grow: 1;
     white-space: nowrap;
     width: 100%;
     align-items: center;
@@ -185,11 +188,13 @@ button:active {
 }
 
 .write-speed-container {
+    z-index: 1;
     display: flex;
     flex-basis: 50%;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow: auto;
 }
 
 #writeSpeedText {

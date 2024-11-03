@@ -381,7 +381,6 @@ rewriteButton.onclick = async function()
         {
             ctx.strokeStyle = selectedPageColour;
             ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
-            ctx.drawImage(selectedBackground, 0, 0);
             
             if (isShowingTrace)
             {
@@ -400,6 +399,8 @@ rewriteButton.onclick = async function()
                     }
                 }
             }
+
+            ctx.drawImage(selectedBackground, 0, 0);
 
             for (i = 0; i < storedLines.length; i++)
             {

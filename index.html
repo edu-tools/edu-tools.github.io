@@ -19,65 +19,84 @@
   </script>
   
   <body>
-    <div class="title-container disable-select">
+    <div class="title-container">
       <h1 class="title-text">Handwriting Repeater</h1>
       <h1 class="date-text" id="dateText">DATE</h1>
     </div>
     <div class="main-container disable-select">
-      <div class="pen-options">
-        <button id="smallPenButton">Small Pen</button>
-        <button id="mediumPenButton">Medium Pen</button>
-        <button id="largePenButton">Large Pen</button>
-      </div>
       <div class="writer-container">
-        <canvas id="writer" width="1400" height="540"></canvas>
-        <canvas id="writerMask" width="1400" height="540"></canvas>
-      </div>
-      <div class="page-options">
-        <button id="backgroundButton1">Background 1</button>
-        <button id="backgroundButton2">Background 2</button>
-        <button id="backgroundButton3">Background 3</button>
-        <button id="backgroundButton4">Background 4</button>
+        <canvas id="writer" width="1920" height="720"></canvas>
+        <canvas id="writerMask" width="1920" height="720"></canvas>
+        <div class="interface">
+          <div class="controls-container disable-select">
+            <div class="reset-do-container">
+              <button id="resetButton">Reset Canvas</button>
+              <div class="undo-redo-container">
+                <button id="undoButton">Undo</button>
+                <button id="redoButton">Redo</button>
+              </div>
+            </div>
+            <div class="rewrite-container">
+              <div class="checkboxes-container">
+                <div class="loop-container">
+                  <p id="loopText">Loop</p>
+                  <input type="checkbox" id="loopCheckbox">
+                </div>
+                <div class="loop-container">
+                  <p id="traceText">Trace</p>
+                  <input type="checkbox" id="traceCheckbox">
+                </div>
+                <div class="loop-container">
+                  <p id="penText">Pen</p>
+                  <input type="checkbox" id="penCheckbox" checked>
+                </div>
+                <div class="loop-container">
+                  <p id="quillText">Quill</p>
+                  <input type="checkbox" id="quillCheckbox">
+                </div> 
+              </div>
+              <div class="colour-picker-container">
+                <canvas id="colourPickerCanvas"></canvas>
+              </div>
+              <button id="rewriteButton">Re-write!</button>
+            </div>
+            <div class="write-speed-container">
+              <input type="range" min="1" max="100" value="20" class="slider" id="speedSlider">
+              <p id="writeSpeedText">Write Speed:</p>
+            </div>
+          </div>
+        </div>
+        <div class="sidebars">
+          <div class="sidebar-left">
+              <div class="pen-options" id="penOptions">
+                <button class="icon-button" id="smallPenButton"><img src="penSmallIcon.svg"/><span>Small Pen</span></button>
+                <button class="icon-button" id="mediumPenButton"><img src="penMediumIcon.svg"/><span>Medium Pen</span></button>
+                <button class="icon-button" id="largePenButton"><img src="penLargeIcon.svg"/><span>Large Pen</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+                <button class="icon-button" id="colourPickerButton"><img src="colourPickerIcon.svg"/><span>Colour Picker</span></button>
+              </div>
+              <button id="collapsePenOptions"></button>
+          </div>
+          <div class="sidebar-right">
+              <div class="pen-options" id="pageOptions">
+                <button class="icon-button" id="backgroundButton1"><img src="colourPickerIcon.svg"/><span>Background 1</span></button>
+                <button class="icon-button" id="backgroundButton2"><img src="colourPickerIcon.svg"/><span>Background 2</span></button>
+                <button class="icon-button" id="backgroundButton3"><img src="colourPickerIcon.svg"/><span>Background 3</span></button>
+                <button class="icon-button" id="backgroundButton4"><img src="colourPickerIcon.svg"/><span>Background 4</span></button>
+              </div>
+              <button id="collapsePageOptions"></button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="controls-container disable-select">
-      <div class="reset-do-container">
-        <button id="resetButton">Reset Canvas</button>
-        <div class="undo-redo-container">
-        <button id="undoButton">Undo</button>
-        <button id="redoButton">Redo</button>
-        </div>
-      </div>
-      <div class="write-speed-container">
-        <input type="range" min="1" max="100" value="20" class="slider" id="speedSlider">
-        <p id="writeSpeedText">Write Speed:</p>
-        <div class="colour-picker-container">
-        <canvas id="colourPickerCanvas"></canvas>
-        </div>
-      </div>
-      <div class="rewrite-container">
-        <button id="rewriteButton">Re-write!</button>
-        <div class="checkboxes-container">
-          <div class="loop-container">
-            <p id="loopText">Loop</p>
-            <input type="checkbox" id="loopCheckbox">
-          </div>
-          <div class="loop-container">
-            <p id="traceText">Trace</p>
-            <input type="checkbox" id="traceCheckbox">
-          </div>
-          <div class="loop-container">
-            <p id="penText">Pen</p>
-            <input type="checkbox" id="penCheckbox" checked>
-          </div>
-          <div class="loop-container">
-            <p id="quillText">Quill</p>
-            <input type="checkbox" id="quillCheckbox">
-          </div> 
-        </div>
-      </div>
-    </div>
+    
 
     <script src="script.js"></script>
   </body>

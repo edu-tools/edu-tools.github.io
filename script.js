@@ -79,7 +79,17 @@ var undoButton = document.getElementById("undoButton");
 var redoButton = document.getElementById("redoButton");
 var penCheckbox = document.getElementById("penCheckbox");
 var quillCheckbox = document.getElementById("quillCheckbox");
+var collapsePenOptionsButton = document.getElementById("collapsePenOptions");
+var collapsePageOptionsButton = document.getElementById("collapsePageOptions");
 
+let smallPenButton = document.getElementById("smallPenButton");
+let mediumPenButton = document.getElementById("mediumPenButton");
+let largePenButton = document.getElementById("largePenButton");
+
+let backgroundButton1 = document.getElementById("backgroundButton1");
+let backgroundButton2 = document.getElementById("backgroundButton2");
+let backgroundButton3 = document.getElementById("backgroundButton3");
+let backgroundButton4 = document.getElementById("backgroundButton4");
 
 
 var ctx = canvasWriter.getContext('2d');
@@ -185,7 +195,7 @@ function resetcanvasWriter(ctx)
 
 // Pen options buttons
 let selectedPenButton = 1;
-document.getElementById("mediumPenButton").innerHTML = "<u>Medium Pen</u>";
+mediumPenButton.classList.add("pen-selected");
 
 
 smallPenButton.onclick = function()
@@ -211,27 +221,31 @@ function selectPenButton()
 {
     if (selectedPenButton == 0)
     {
-        document.getElementById("smallPenButton").innerHTML = "<u>Small Pen</u>";
-        document.getElementById("mediumPenButton").innerHTML = "Medium Pen";
-        document.getElementById("largePenButton").innerHTML = "Large Pen";
+        smallPenButton.classList.remove("pen-selected");
+        mediumPenButton.classList.remove("pen-selected");
+        largePenButton.classList.remove("pen-selected");
+        smallPenButton.classList.add("pen-selected");
     }
     else if (selectedPenButton == 1)
     {
-        document.getElementById("smallPenButton").innerHTML = "Small Pen";
-        document.getElementById("mediumPenButton").innerHTML = "<u>Medium Pen</u>";
-        document.getElementById("largePenButton").innerHTML = "Large Pen";
+        smallPenButton.classList.remove("pen-selected");
+        mediumPenButton.classList.remove("pen-selected");
+        largePenButton.classList.remove("pen-selected");
+        mediumPenButton.classList.add("pen-selected");
     }
     else if (selectedPenButton == 2)
     {
-        document.getElementById("smallPenButton").innerHTML = "Small Pen";
-        document.getElementById("mediumPenButton").innerHTML = "Medium Pen";
-        document.getElementById("largePenButton").innerHTML = "<u>Large Pen</u>";
+        smallPenButton.classList.remove("pen-selected");
+        mediumPenButton.classList.remove("pen-selected");
+        largePenButton.classList.remove("pen-selected");
+        largePenButton.classList.add("pen-selected");
     }
 }
 
 // Page background buttons
 let selectedPageButton = 0;
-document.getElementById("backgroundButton1").innerHTML = "<u>Background 1</u>";
+backgroundButton1.classList.add("pen-selected");
+
 
 backgroundButton1.onclick = function()
 {
@@ -266,35 +280,51 @@ backgroundButton4.onclick = function()
     selectPageButton();
 }
 
+collapsePenOptionsButton.onclick = function()
+{
+    document.querySelector('#penOptions').classList.toggle('collapse');
+    collapsePenOptionsButton.classList.toggle("collapse-button-collapsed");
+}
+
+collapsePageOptionsButton.onclick = function()
+{
+    document.querySelector('#pageOptions').classList.toggle('collapse');
+    collapsePageOptionsButton.classList.toggle("collapse-button-collapsed");
+}
+
 function selectPageButton() 
 {
     if (selectedPageButton == 0)
     {
-        document.getElementById("backgroundButton1").innerHTML = "<u>Background 1</u>";
-        document.getElementById("backgroundButton2").innerHTML = "Background 2";
-        document.getElementById("backgroundButton3").innerHTML = "Background 3";
-        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        backgroundButton1.classList.remove("pen-selected");
+        backgroundButton2.classList.remove("pen-selected");
+        backgroundButton3.classList.remove("pen-selected");
+        backgroundButton4.classList.remove("pen-selected");
+        backgroundButton1.classList.add("pen-selected");
     }
     else if (selectedPageButton == 1)
     {
-        document.getElementById("backgroundButton1").innerHTML = "Background 1";
-        document.getElementById("backgroundButton2").innerHTML = "<u>Background 2</u>";
-        document.getElementById("backgroundButton3").innerHTML = "Background 3";
-        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        backgroundButton1.classList.remove("pen-selected");
+        backgroundButton2.classList.remove("pen-selected");
+        backgroundButton3.classList.remove("pen-selected");
+        backgroundButton4.classList.remove("pen-selected");
+        backgroundButton2.classList.add("pen-selected");
     }
     else if (selectedPageButton == 2)
     {
-        document.getElementById("backgroundButton1").innerHTML = "Background 1";
-        document.getElementById("backgroundButton2").innerHTML = "Background 2";
-        document.getElementById("backgroundButton3").innerHTML = "<u>Background 3</u>";
-        document.getElementById("backgroundButton4").innerHTML = "Background 4";
+        backgroundButton1.classList.remove("pen-selected");
+        backgroundButton2.classList.remove("pen-selected");
+        backgroundButton3.classList.remove("pen-selected");
+        backgroundButton4.classList.remove("pen-selected");
+        backgroundButton3.classList.add("pen-selected");
     }
     else if (selectedPageButton == 3)
     {
-        document.getElementById("backgroundButton1").innerHTML = "Background 1";
-        document.getElementById("backgroundButton2").innerHTML = "Background 2";
-        document.getElementById("backgroundButton3").innerHTML = "Background 3";
-        document.getElementById("backgroundButton4").innerHTML = "<u>Background 4</u>";
+        backgroundButton1.classList.remove("pen-selected");
+        backgroundButton2.classList.remove("pen-selected");
+        backgroundButton3.classList.remove("pen-selected");
+        backgroundButton4.classList.remove("pen-selected");
+        backgroundButton4.classList.add("pen-selected");
     }
 }
 
@@ -363,8 +393,7 @@ redoButton.onclick = function()
 }
 
 rewriteButton.onclick = async function()
-{
-    
+{    
     if (!isRewriting && storedLines.length != 0)
     {
         gtag('event', 'activate_rewrite', {
@@ -506,7 +535,7 @@ quillCheckbox.onchange = function()
 }
 
 // When mouse clicked, draws line on click and sets mouseHeld to true for 'mousemove' events. 
-document.addEventListener('touchstart', event => 
+canvasWriter.addEventListener('touchstart', event => 
 {
     event = event.touches[0];
 
@@ -540,7 +569,7 @@ document.addEventListener('touchstart', event =>
     return false;
 });
 
-document.addEventListener('mousedown', event => 
+canvasWriter.addEventListener('mousedown', event => 
 {   
     if (!isRewriting)
     {        
@@ -708,5 +737,4 @@ function dateSuffix(dayString)
     {
         return (dayString += "th");
     }
-
 }

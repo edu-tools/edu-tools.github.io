@@ -14,10 +14,9 @@ body {
 
 .title-container {
     display: flex;
-    padding: 0;
-    margin: 0;
     padding-top: 1vh;
     padding-bottom: 2vh;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -44,7 +43,7 @@ body {
 }
 
 button {
-    background-color: royalblue; /* Green */
+    background-color: rgb(65, 105, 225, 0.5); /* Green */
     border: solid 2px rgb(0, 0, 255);
     border-radius: 10px;
     color: white;
@@ -54,9 +53,11 @@ button {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 1.2vw;
+    font-size: 20px;
     outline: none;
     cursor: pointer;
+    z-index: 9999;
+    overflow: hidden;
 }
 
 button:active {
@@ -64,66 +65,192 @@ button:active {
     transform: translateY(4px);
 }
 
+button:hover {
+    background-color: rgb(98, 132, 235); /* Green */
+}
+
 .main-container {
+    margin-bottom: 10px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-block: 20px;
+    justify-content: space-around;
+    width: 100%;
 }
 
 .writer-container {
-    display: flex;
     touch-action: none;
-    overflow-x: scroll;
-    position: relative;
-    flex-basis: 60%;
-    justify-content: flex-start;
-    max-width: fit-content;
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow-x: hidden;
+}
+
+#writerMask {
+    grid-row-start: 1;
+    grid-column-start: 1;
+    pointer-events: none;
+    touch-action: none;
+}
+
+#writer {
+    grid-row-start: 1;
+    grid-column-start: 1;
+}
+
+.interface {
+    pointer-events: none;
+    grid-row-start: 1;
+    grid-column-start: 1;
+    width: 100vw;
+    height: 100%;
+}
+
+.sidebars {
+    pointer-events: none;
+    grid-row-start: 1;
+    grid-column-start: 1;
+    width: 100vw;
+    height: 100%;
+}
+
+.sidebar-right {
+    display: flex;
+    direction: rtl;
+    float: right;
+    height: 100%;
+}
+
+.sidebar-left {
+    display: flex;
+    float: left;
+    height: 100%;
+}
+
+#collapsePageOptions {
+    pointer-events: auto;
+    align-self: center;
+    border-radius: 10px 0px 0px 10px;
+    border-right: none;
+    height: 150px;
+    width: 100px;
+    transition: all .3s ease;
 }
 
 
-#writerMask {
-    display: flex;
-    touch-action: none;
-    position: absolute;
+#collapsePenOptions {
+    pointer-events: auto;
+    align-self: center;
+    border-radius: 0px 10px 10px 0px;
+    border-left: none;
+    height: 150px;
+    width: 100px;
+    transition: all .3s ease;
+}
+
+.collapse-button-collapsed {
+    max-width: 50px;
 }
 
 .pen-options {
+    pointer-events: auto;
     display: flex;
-    flex-basis: 20%;
+    position: relative;
     flex-direction: column;
-    flex-grow: 1;
     white-space: nowrap;
-    width: 100%;
     align-items: center;
+    max-width: 100%;
+    transition: all .3s ease;
+    overflow: hidden;
+    background-color: rgb(183, 208, 255, 0.5);
+    outline: solid 2px rgb(0, 0, 255, 0.5);
+    max-height: 720px;
+    overflow-y: scroll;
+    opacity: 100%;
+}
 
+.pen-options.collapse {
+    max-width: 92px;
+}
+
+/* width */
+.sidebar-left ::-webkit-scrollbar {
+    width: 25px;
+}
+
+/* Track */
+.sidebar-left ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    background: rgb(183, 208, 255, 0.5);
+}
+  
+  /* Handle */
+.sidebar-left ::-webkit-scrollbar-thumb {
+    background: rgb(0, 0, 255, 0.4); 
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.sidebar-left ::-webkit-scrollbar-thumb:hover {
+    background: royalblue; 
+}
+
+/* width */
+.sidebar-right ::-webkit-scrollbar {
+    width: 25px;
+}
+
+/* Track */
+.sidebar-right ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    background: rgb(183, 208, 255, 0.5);
+}
+  
+  /* Handle */
+.sidebar-right ::-webkit-scrollbar-thumb {
+    background: rgb(0, 0, 255, 0.4); 
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.sidebar-right ::-webkit-scrollbar-thumb:hover {
+    background: royalblue; 
 }
 
 .pen-options button {
-    padding-block: 2rem;
-    margin-block: 2rem;
-    width: 70%;
-}
-
-.page-options {
     display: flex;
-    flex-basis: 20%;
-    flex-direction: column;
-    flex-grow: 1;
-    white-space: nowrap;
-    width: 100%;
     align-items: center;
+    padding-block: 30px;
+    text-overflow: clip;
+    width: 100%;
+    border-radius: 0px 0px 0px 0px;
+    border-left: none;
+    border-right: none;
 }
 
-.page-options button {
-    padding-block: 2.4rem;
-    margin-bottom: 2rem;
-    justify-content: space-around;
-    width: 70%;
+.pen-options .pen-selected {
+    text-decoration: underline;
+    background-color: royalblue;
+}
+
+.icon-button {
+    min-height: 80px;
+    max-height: 80px;
+}
+
+.icon-button img {
+    width: 50px;
+    margin-inline: 10px;
+    opacity: 100%;
+}
+
+.icon-button span {
+    width: 100%;
+    margin-inline: 10px;
 }
 
 .controls-container {
     display: flex;
+    flex-direction: column;
+    justify-content: end;
+    height: 100%;  
 }
 
 .reset-do-container {
@@ -137,7 +264,8 @@ button:active {
 #resetButton {
     padding-block: 20px;
     margin-bottom: 25px;
-    width: 55%;
+    padding: 20px;
+    pointer-events: all;
 }
 
 .undo-redo-container {
@@ -148,11 +276,24 @@ button:active {
 .undo-redo-container button {
     margin-inline: 1vw;
     padding: 20px;
+    pointer-events: all;
+}
+
+.interface button {
+    pointer-events: all;
+}
+
+.interface .slider {
+    pointer-events: all;
+}
+
+.interface input {
+    pointer-events: all;
 }
 
 .slider {
     -webkit-appearance: none;
-    width: 40%;
+    width: 30%;
     height: 20px;
     border-radius: 50px;
     border: 2px solid grey;
@@ -188,50 +329,53 @@ button:active {
 }
 
 .write-speed-container {
-    z-index: 1;
     display: flex;
-    flex-basis: 50%;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     overflow: auto;
+    padding-block: 20px;
 }
 
 #writeSpeedText {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
+    font-size: 2vh;
     font-weight: bold;
     color: blue;
     text-shadow: 1px 1px white;
-    padding: 20px;
+    margin-top: 15px;
 }
 
 .colour-picker-container {
     display: flex;
+    width: fit-content;
+    justify-content: center;
+    align-self: center;
     background-color: rgb(139, 161, 226);
     padding: 3px;
     border-radius: 10px;
     border: 3px solid blue;
+    pointer-events: all;
+    margin-top: 10px;
 }
 
 .rewrite-container {
     display: flex;
-    flex-basis: 25%;
     flex-direction: column;
     align-items: center;
 }
 
 #rewriteButton {
     padding-block: 10px;
-    padding-inline: 3vw;
+    padding-inline: 60px;
     white-space: nowrap;
-    margin-bottom: 10px;
     background-color: darkblue;
     color: white;
     text-shadow: 2px 2px black;
     border: 3px solid white;
-    font-size: 2vw;
+    font-size: 4vh;
     border-radius: 50px;
+    pointer-events: all;
 }
 
 .checkboxes-container {
@@ -247,8 +391,6 @@ button:active {
     align-items: center;
     width: 100%;
     justify-content: flex-end;
-    margin-block: 0.2vw;
-
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
     font-size: calc(12px + 0.2vw);
@@ -259,8 +401,6 @@ button:active {
 .loop-container input {
     margin-left: 20px;
 }
-
-
 
 .disable-select {
     user-select: none; /* supported by Chrome and Opera */

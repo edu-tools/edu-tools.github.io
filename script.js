@@ -1,5 +1,42 @@
+class StoredData
+{
+    userSettings = new UserSettings();
+    storedLines = [];
+
+    constructor(userSettings, storedLines = []) {
+        this.userSettings = userSettings;
+        this.storedLines = storedLines;
+    }
+}
+
+class UserSettings
+{
+    loopOn = false;
+    traceOn = false;
+    selectedPenImage = PenImage.Marker;
+    selectedPenColour = [0, 0, 0];
+    selectedPenWidth = 10;
+    selectedBackground = "BlueDottedLines";
+}
+
+const PenImage = {
+    None: 'None',
+    Marker: 'Marker',
+    Quill: 'Quill',
+};
+
+
+const BackgroundImage = {
+    BlueDottedLines: 'BlueDottedLines',
+    Marker: 'Marker',
+    Quill: 'Quill',
+};
+
 class Point
 {
+    x = 0;
+    y = 0;
+
     constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
@@ -8,6 +45,9 @@ class Point
 
 class PenOptions
 {
+    colour = 'rgb(0, 0, 0)';
+    width = 1;
+
     constructor(colour = 'rgb(0, 0, 0)', width = 1) {
         this.colour = colour;
         this.width = width;
@@ -16,6 +56,10 @@ class PenOptions
 
 class DrawnLine
 {
+    start = new Point();
+    end = new Point();
+    penOptions = new PenOptions();
+
     constructor(start = new Point(), end = new Point(), penOptions = new PenOptions()) {
         this.start = start;
         this.end = end;
@@ -79,13 +123,6 @@ let backgroundButton4 = document.getElementById("backgroundButton4");
 var ctx = canvasWriter.getContext('2d');
 var ctxMask = canvasWriterMask.getContext('2d');
 
-
-function mod(n, m) 
-{
-    return ((n % m) + m) % m;
-}
-
-
 // Colours
 let defaultColour = colourArrayToRGBString([240, 240, 240]);
 
@@ -114,19 +151,20 @@ penImage.src = "pen.svg";
 
 let selectedBackground = blueLineImage;
 
-
 selectedBackground.onload = () => { ctx.drawImage(selectedBackground, 0, 0); };
 
 // Pen 
-let smallPenWidth = "5";
-let mediumPenWidth = "10";
-let largePenWidth = "20";
+let smallPenWidth = 5;
+let mediumPenWidth = 10;
+let largePenWidth = 20;
 
 let selectedPenWidth = mediumPenWidth;
 
 ctx.lineWidth = selectedPenWidth;
 ctx.lineCap = "round";
 let selectedPenColour = [0, 0, 0];
+
+loadFromLocalStorage();
 
 let isShowingTrace = false;
 let isShowingPen = true;
@@ -589,10 +627,7 @@ document.addEventListener('touchend', event =>
 {
     if (mouseHeld)
     {
-    event = event.touches[0];
-    storedLines.push(currentLine.slice());
-    currentLine = [];
-    mouseHeld = false;
+        endDraw();
     }
 });
 
@@ -600,11 +635,53 @@ document.addEventListener('mouseup', event =>
 {
     if (mouseHeld)
     {
-        storedLines.push(currentLine.slice());
-        currentLine = [];
-        mouseHeld = false;
+        endDraw();
     }
 });
+
+function endDraw() {
+    storedLines.push(currentLine.slice());
+    currentLine = [];
+    mouseHeld = false;
+
+    saveToLocalStorage();    
+}
+
+function saveToLocalStorage() {
+    if (!storageAvailable("localStorage")) {
+        return;
+    }
+
+    const userSettings = new UserSettings();
+    userSettings.loopOn = isLooping;
+    userSettings.traceOn = isShowingTrace;
+    userSettings.selectedPenImage = selectedPenImage;
+    userSettings.selectedPenColour = selectedPenColour;
+    userSettings.selectedPenWidth = selectedPenWidth;
+    userSettings.selectedBackground = selectedBackground;
+
+    const saveData = new StoredData(userSettings, storedLines);
+
+    const stringData = JSON.stringify(saveData);
+    localStorage.setItem("handwritingRepeater", stringData);
+}
+
+function loadFromLocalStorage() {
+    if (!storageAvailable("localStorage")) {
+        return;
+    }
+
+    const stringData = localStorage.getItem("handwritingRepeater");
+    if (!stringData) {
+        return;
+    }
+
+    let storedData = new StoredData();
+    storedData = JSON.parse(stringData);
+
+    selectedPenColour = storedData.userSettings.selectedPenColour;
+    selectedPenWidth = storedData.userSettings.selectedPenWidth;
+}
 
 document.addEventListener('touchmove', event => 
 {
@@ -657,7 +734,6 @@ document.addEventListener('mousemove', event =>
         ctx.stroke();
 
         drawOrigin = mousePos;
-        
     }
 });
 
@@ -753,3 +829,23 @@ function getDateDisplayText()
         + months[date.getMonth()] + " "
         + date.getFullYear();
 }
+
+// Taken from https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
+function storageAvailable(type) {
+    let storage;
+    try {
+      storage = window[type];
+      const x = "__storage_test__";
+      storage.setItem(x, x);
+      storage.removeItem(x);
+      return true;
+    } catch (e) {
+      return (
+        e instanceof DOMException &&
+        e.name === "QuotaExceededError" &&
+        // acknowledge QuotaExceededError only if there's something already stored
+        storage &&
+        storage.length !== 0
+      );
+    }
+  }

@@ -26,43 +26,9 @@ class DrawnLine
 // Selects canvasWriter element to draw on from page 
 var canvasWriter = document.getElementById("writer");
 
-// 
 var canvasWriterMask = document.getElementById("writerMask");
 
-
-const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-];
-
-const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-];
-
-const date = new Date();
-
-const dateString = days[date.getDay()] + ", "
-    + appendDateDaySuffix(date.getDate().toString()) + " "
-    + months[date.getMonth()]; + " "
-    + date.getFullYear();
-
-dateText.innerHTML = dateString;
+document.getElementById("dateText").innerHTML = getDateDisplayText();
 
 // Selects colour picker canvasWriter and draws colour picker image
 var canvasColour = document.getElementById("colourPickerCanvas");
@@ -737,25 +703,53 @@ function faintColourArray(colourArray)
 
 function appendDateDaySuffix(dayString)
 {
-    if (dayString.length == 2 && dayString[0] == '1')
-    {
-        return (dayString += "th");
+    switch (dayString) {
+        case "1":
+        case "21":
+        case "31":
+            return dayString + "st";
+        case "2":
+        case "22":
+            return dayString + "nd";
+        case "3":
+        case "23":
+            return dayString + "rd";
+        default:
+            return dayString + "th";
+    }
+}
 
-    }
-    else if (dayString[dayString.length - 1] == '1')
-    {
-        return (dayString += "st");
-    }
-    else if (dayString[dayString.length - 1] == '2')
-    {
-        return (dayString += "nd");
-    }
-    else if (dayString[dayString.length - 1] == '3')
-    {
-        return (dayString += "rd");
-    }
-    else
-    {
-        return (dayString += "th");
-    }
+function getDateDisplayText()
+{
+    const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
+    
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+    
+    const date = new Date();
+    
+    return days[date.getDay()] + ", "
+        + appendDateDaySuffix(date.getDate().toString()) + " "
+        + months[date.getMonth()] + " "
+        + date.getFullYear();
 }

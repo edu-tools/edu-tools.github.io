@@ -17,6 +17,7 @@ class UserSettings
     selectedPenColour = [0, 0, 0];
     selectedPenWidth = 10;
     selectedBackground = "BlueDottedLines";
+    rewriteSpeed = 2;
 }
 
 const PenImage = {
@@ -30,6 +31,12 @@ const BackgroundImage = {
     BlueDottedLines: 'BlueDottedLines',
     Marker: 'Marker',
     Quill: 'Quill',
+};
+
+const PenWidth = {
+    Small: 5,
+    Medium: 10,
+    Large: 20,
 };
 
 class Point
@@ -153,12 +160,7 @@ let selectedBackground = blueLineImage;
 
 selectedBackground.onload = () => { ctx.drawImage(selectedBackground, 0, 0); };
 
-// Pen 
-let smallPenWidth = 5;
-let mediumPenWidth = 10;
-let largePenWidth = 20;
-
-let selectedPenWidth = mediumPenWidth;
+let selectedPenWidth = PenWidth.Medium;
 
 ctx.lineWidth = selectedPenWidth;
 ctx.lineCap = "round";
@@ -171,13 +173,13 @@ let isShowingPen = true;
 let selectedPenImage = penImage;
 //
 
-let mouseHeld = false;
+let penDown = false;
 
 let isRewriting = false;
 
 let isLooping = false;
 
-let drawOrigin = new Point(0, 0);
+let previousDrawPosition = new Point(0, 0);
 
 //
 let currentLine = [];
@@ -219,19 +221,19 @@ mediumPenButton.classList.add("pen-selected");
 
 smallPenButton.onclick = function()
 {
-    selectedPenWidth = smallPenWidth;
+    selectedPenWidth = PenWidth.Small;
     selectedPenButton = 0;
     selectPenButton();
 }
 mediumPenButton.onclick = function()
 {
-    selectedPenWidth = mediumPenWidth;
+    selectedPenWidth = PenWidth.Medium;
     selectedPenButton = 1;
     selectPenButton();
 }
 largePenButton.onclick = function()
 {
-    selectedPenWidth = largePenWidth;
+    selectedPenWidth = PenWidth.Large;
     selectedPenButton = 2;
     selectPenButton();
 }
@@ -387,8 +389,6 @@ redoButton.onclick = function()
     if (!isRewriting && deletedLines.length != 0)
     {
         storedLines.push(deletedLines.pop());
-
-    
     
         ctx.strokeStyle = selectedPageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
@@ -485,7 +485,6 @@ rewriteButton.onclick = async function()
     }
 }
 
-
 speedSlider.oninput = function()
 {
     rewriteSpeed = speedSlider.value;
@@ -553,96 +552,66 @@ quillCheckbox.onchange = function()
     }
 }
 
-// When mouse clicked, draws line on click and sets mouseHeld to true for 'mousemove' events. 
 canvasWriter.addEventListener('touchstart', event => 
 {
     event = event.touches[0];
-
-    if (!isRewriting)
-    {        
-        let bound = canvasWriter.getBoundingClientRect();
-        
-        const mousePos = new Point(
-            event.clientX - bound.left - canvasWriter.clientLeft, 
-            event.clientY - bound.top - canvasWriter.clientTop
-        );
-
-        if (mousePos.x > 0 && mousePos.x < canvasWriter.width && mousePos.y > 0 && mousePos.y < canvasWriter.height)
-        {
-            deletedLines = [];
-
-            ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-            ctx.beginPath();        
-            ctx.lineWidth = selectedPenWidth;
-
-            ctx.moveTo(mousePos.x, mousePos.y);
-            ctx.lineTo(mousePos.x, mousePos.y);
-            ctx.stroke();
-
-            currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
-
-            drawOrigin = mousePos;
-
-            mouseHeld = true;
-        }
-    }
-    
-    return false;
+    drawStart(event);
 });
 
 canvasWriter.addEventListener('mousedown', event => 
 {   
-    if (!isRewriting)
-    {        
-        let bound = canvasWriter.getBoundingClientRect();
-
-        const mousePos = new Point(
-            event.clientX - bound.left - canvasWriter.clientLeft,
-            event.clientY - bound.top - canvasWriter.clientTop
-        );
-
-        if (mousePos.x > 0 && mousePos.x < canvasWriter.width && mousePos.y > 0 && mousePos.y < canvasWriter.height)
-        {
-            deletedLines = [];
-
-            ctx.beginPath();   
-            ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-     
-            ctx.lineWidth = selectedPenWidth;
-
-            ctx.moveTo(mousePos.x, mousePos.y);
-            ctx.lineTo(mousePos.x, mousePos.y);
-            ctx.stroke();
-
-            currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
-
-            drawOrigin = mousePos;
-
-            mouseHeld = true;
-        }
-    }
+    drawStart(event);
 });
+
+function drawStart(event) {
+    if (!isRewriting)
+        {        
+            let bound = canvasWriter.getBoundingClientRect();
+            
+            const mousePos = new Point(
+                event.clientX - bound.left - canvasWriter.clientLeft, 
+                event.clientY - bound.top - canvasWriter.clientTop
+            );
+    
+            if (mousePos.x > 0 && mousePos.x < canvasWriter.width && mousePos.y > 0 && mousePos.y < canvasWriter.height)
+            {
+                deletedLines = [];
+    
+                ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
+                ctx.beginPath();        
+                ctx.lineWidth = selectedPenWidth;
+    
+                ctx.moveTo(mousePos.x, mousePos.y);
+                ctx.lineTo(mousePos.x, mousePos.y);
+                ctx.stroke();
+    
+                currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
+    
+                previousDrawPosition = mousePos;
+    
+                penDown = true;
+            }
+        }
+}
 
 document.addEventListener('touchend', event => 
 {
-    if (mouseHeld)
-    {
-        endDraw();
-    }
+    drawEnd();
 });
 
 document.addEventListener('mouseup', event => 
 {
-    if (mouseHeld)
-    {
-        endDraw();
-    }
+    drawEnd();
 });
 
-function endDraw() {
+function drawEnd() {
+    if (!penDown) {
+        return;
+    }
+
     storedLines.push(currentLine.slice());
     currentLine = [];
-    mouseHeld = false;
+    penDown = false;
 
     saveToLocalStorage();    
 }
@@ -659,6 +628,7 @@ function saveToLocalStorage() {
     userSettings.selectedPenColour = selectedPenColour;
     userSettings.selectedPenWidth = selectedPenWidth;
     userSettings.selectedBackground = selectedBackground;
+    userSettings.rewriteSpeed = rewriteSpeed;
 
     const saveData = new StoredData(userSettings, storedLines);
 
@@ -679,63 +649,43 @@ function loadFromLocalStorage() {
     let storedData = new StoredData();
     storedData = JSON.parse(stringData);
 
-    selectedPenColour = storedData.userSettings.selectedPenColour;
-    selectedPenWidth = storedData.userSettings.selectedPenWidth;
+    // TODO
 }
 
-document.addEventListener('touchmove', event => 
-{
-
+document.addEventListener('touchmove', event => {
     event = event.touches[0];
 
-    if (mouseHeld)
-    {
-        ctx.beginPath();        
-        ctx.lineWidth = selectedPenWidth;
-        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-        ctx.moveTo(drawOrigin.x, drawOrigin.y);
-        let bound = canvasWriter.getBoundingClientRect();
-
-        const mousePos = new Point(
-            event.clientX - bound.left - canvasWriter.clientLeft,
-            event.clientY - bound.top - canvasWriter.clientTop
-        );
-
-        currentLine.push(new DrawnLine(drawOrigin, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
-
-        ctx.lineTo(mousePos.x, mousePos.y);
-        ctx.stroke();
-
-        drawOrigin = mousePos;
-        
+    if (penDown) {
+        drawMove(event);
     }
 });
 
-document.addEventListener('mousemove', event => 
-{
-
-    if (mouseHeld)
-    {
-        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-        ctx.beginPath();        
-        ctx.lineWidth = selectedPenWidth;
-
-        ctx.moveTo(drawOrigin.x, drawOrigin.y);
-        let bound = canvasWriter.getBoundingClientRect();
-
-        const mousePos = new Point(
-            event.clientX - bound.left - canvasWriter.clientLeft,
-            event.clientY - bound.top - canvasWriter.clientTop
-        );
-
-        currentLine.push(new DrawnLine(drawOrigin, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
-
-        ctx.lineTo(mousePos.x, mousePos.y);
-        ctx.stroke();
-
-        drawOrigin = mousePos;
+document.addEventListener('mousemove', event => {
+    if (penDown) {
+        drawMove(event);
     }
 });
+
+function drawMove(event) {
+    ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
+    ctx.beginPath();        
+    ctx.lineWidth = selectedPenWidth;
+
+    ctx.moveTo(previousDrawPosition.x, previousDrawPosition.y);
+    let bound = canvasWriter.getBoundingClientRect();
+
+    const mousePos = new Point(
+        event.clientX - bound.left - canvasWriter.clientLeft,
+        event.clientY - bound.top - canvasWriter.clientTop
+    );
+
+    currentLine.push(new DrawnLine(previousDrawPosition, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
+
+    ctx.lineTo(mousePos.x, mousePos.y);
+    ctx.stroke();
+
+    previousDrawPosition = mousePos;
+};
 
 // Colour picker click
 colourPickerCanvas.addEventListener('mousedown', event => 

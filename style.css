@@ -293,6 +293,7 @@ button:hover {
 
 .slider {
     -webkit-appearance: none;
+    appearance: none;
     width: 30%;
     height: 20px;
     border-radius: 50px;

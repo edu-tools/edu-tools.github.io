@@ -368,10 +368,10 @@ undoButton.onclick = function()
             for(j = 0; j < storedLines[i].length; j++)
             {
                 ctx.beginPath();  
-                ctx.lineWidth = storedLines[i][j][4];
-                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j][5]);
-                ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
-                ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
+                ctx.lineWidth = storedLines[i][j].penOptions.width;
+                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j].penOptions.colour);
+                ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
+                ctx.lineTo(storedLines[i][j].end.x, storedLines[i][j].end.y);
                 ctx.stroke();   
             }
         } 
@@ -396,11 +396,11 @@ redoButton.onclick = function()
         {
             for(j = 0; j < storedLines[i].length; j++)
             {
-                ctx.lineWidth = storedLines[i][j][4];
-                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j][5]);
+                ctx.lineWidth = storedLines[i][j].penOptions.width;
+                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j].penOptions.colour);
                 ctx.beginPath();        
-                ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
-                ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
+                ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
+                ctx.lineTo(storedLines[i][j].end.x, storedLines[i][j].end.y);
                 ctx.stroke();   
             }
         } 
@@ -433,12 +433,12 @@ rewriteButton.onclick = async function()
                     for(j = 0; j < storedLines[i].length; j++)
                     {
                         ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
-                        ctx.lineWidth = storedLines[i][j][4];
-                        let baseColour = storedLines[i][j][5];
+                        ctx.lineWidth = storedLines[i][j].penOptions.width;
+                        let baseColour = storedLines[i][j].penOptions.colour;
                         ctx.strokeStyle = colourArrayToRGBString(faintColourArray(baseColour));
                         ctx.beginPath();        
-                        ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
-                        ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
+                        ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
+                        ctx.lineTo(storedLines[i][j].end.y, storedLines[i][j].end.y);
                         ctx.stroke();
                     }
                 }
@@ -451,14 +451,14 @@ rewriteButton.onclick = async function()
                 for(j = 0; j < storedLines[i].length; j++)
                 {
                     ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
-                    ctx.lineWidth = storedLines[i][j][4];
-                    ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j][5]);
+                    ctx.lineWidth = storedLines[i][j].penOptions.width;
+                    ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j].penOptions.colour);
                     ctx.beginPath();        
-                    ctx.moveTo(storedLines[i][j][0], storedLines[i][j][1]);
-                    ctx.lineTo(storedLines[i][j][2], storedLines[i][j][3]);
+                    ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
+                    ctx.lineTo(storedLines[i][j].end.x, storedLines[i][j].end.y);
                     if (isShowingPen)
                     {
-                        ctxMask.drawImage(selectedPenImage, storedLines[i][j][2], storedLines[i][j][3] - selectedPenImage.height);
+                        ctxMask.drawImage(selectedPenImage, storedLines[i][j].end.x, storedLines[i][j].end.y - selectedPenImage.height);
                     }
                     ctx.stroke();   
             
@@ -575,7 +575,7 @@ canvasWriter.addEventListener('touchstart', event =>
             ctx.lineTo(mousePos.x, mousePos.y);
             ctx.stroke();
 
-            currentLine.push([mousePos.x, mousePos.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
+            currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
 
             drawOrigin = mousePos;
 
@@ -610,7 +610,7 @@ canvasWriter.addEventListener('mousedown', event =>
             ctx.lineTo(mousePos.x, mousePos.y);
             ctx.stroke();
 
-            currentLine.push([mousePos.x, mousePos.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
+            currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
 
             drawOrigin = mousePos;
 
@@ -658,7 +658,7 @@ document.addEventListener('touchmove', event =>
             event.clientY - bound.top - canvasWriter.clientTop
         );
 
-        currentLine.push([drawOrigin.x, drawOrigin.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
+        currentLine.push(new DrawnLine(drawOrigin, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
 
         ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();
@@ -685,7 +685,7 @@ document.addEventListener('mousemove', event =>
             event.clientY - bound.top - canvasWriter.clientTop
         );
 
-        currentLine.push([drawOrigin.x, drawOrigin.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
+        currentLine.push(new DrawnLine(drawOrigin, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
 
         ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();

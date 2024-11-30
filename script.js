@@ -1,54 +1,6 @@
-class StoredData
-{
-    userSettings = new UserSettings();
-    storedLines = [];
-
-    constructor(userSettings, storedLines = []) {
-        this.userSettings = userSettings;
-        this.storedLines = storedLines;
-    }
-}
-
-class UserSettings
-{
-    loopOn = false;
-    traceOn = false;
-    selectedPenImage = PenImage.Marker;
-    selectedPenColour = [0, 0, 0];
-    selectedPenWidth = 10;
-    selectedBackground = "BlueDottedLines";
-    rewriteSpeed = 2;
-}
-
-const PenImage = {
-    None: 'None',
-    Marker: 'Marker',
-    Quill: 'Quill',
-};
-
-
-const BackgroundImage = {
-    BlueDottedLines: 'BlueDottedLines',
-    Marker: 'Marker',
-    Quill: 'Quill',
-};
-
-const PenWidth = {
-    Small: 5,
-    Medium: 10,
-    Large: 20,
-};
-
-class Point
-{
-    x = 0;
-    y = 0;
-
-    constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
-    }
-}
+import { UserData } from "./UserData.js";
+import { Point } from "./Point.js";
+import { PenImage, BackgroundImage, PenWidth } from "./enums.js";
 
 class PenOptions
 {
@@ -73,6 +25,9 @@ class DrawnLine
         this.penOptions = penOptions;
     }
 }
+
+const userData = new UserData();
+userData.loadFromLocalStorage();
 
 // Selects canvasWriter element to draw on from page 
 var canvasWriter = document.getElementById("writer");
@@ -166,9 +121,6 @@ ctx.lineWidth = selectedPenWidth;
 ctx.lineCap = "round";
 let selectedPenColour = [0, 0, 0];
 
-loadFromLocalStorage();
-
-let isShowingTrace = false;
 let isShowingPen = true;
 let selectedPenImage = penImage;
 //
@@ -177,13 +129,10 @@ let penDown = false;
 
 let isRewriting = false;
 
-let isLooping = false;
-
 let previousDrawPosition = new Point(0, 0);
 
 //
 let currentLine = [];
-let storedLines = [];
 let deletedLines = [];
 //
 
@@ -272,7 +221,7 @@ backgroundButton1.onclick = function()
 {
     selectedBackground = blueLineImage;
     resetcanvasWriter(ctx);
-    storedLines = [];
+    userData.storedLines = [];
     selectedPageButton = 0;
     selectPageButton();
 }
@@ -280,7 +229,7 @@ backgroundButton2.onclick = function()
 {
     selectedBackground = greyDottedLineImage;
     resetcanvasWriter(ctx);
-    storedLines = [];
+    userData.storedLines = [];
     selectedPageButton = 1;
     selectPageButton();
 }
@@ -288,7 +237,7 @@ backgroundButton3.onclick = function()
 {
     selectedBackground = redBlueLineImage;
     resetcanvasWriter(ctx);
-    storedLines = [];
+    userData.storedLines = [];
     selectedPageButton = 2;
     selectPageButton();
 }
@@ -296,7 +245,7 @@ backgroundButton4.onclick = function()
 {
     selectedBackground = greyLineImage;
     resetcanvasWriter(ctx);
-    storedLines = [];
+    userData.storedLines = [];
     selectedPageButton = 3;
     selectPageButton();
 }
@@ -353,34 +302,20 @@ function selectPageButton()
 resetButton.onclick = function()
 {
     resetcanvasWriter(ctx);
-    storedLines = [];
+    userData.storedLines = [];
 }
 
 undoButton.onclick = function()
 {
-    if (!isRewriting && deletedLines.length < 100 && storedLines.length > 0)
+    if (!isRewriting && deletedLines.length < 100 && userData.storedLines.length > 0)
     {
-        deletedLines.push(storedLines.pop());
-    
+        deletedLines.push(userData.storedLines.pop());
     
         ctx.fillStyle = selectedPageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         ctx.drawImage(selectedBackground, 0, 0);
-        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-        ctx.lineWidth = selectedPenWidth;
 
-        for (i = 0; i < storedLines.length; i++)
-        {
-            for(j = 0; j < storedLines[i].length; j++)
-            {
-                ctx.beginPath();  
-                ctx.lineWidth = storedLines[i][j].penOptions.width;
-                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j].penOptions.colour);
-                ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
-                ctx.lineTo(storedLines[i][j].end.x, storedLines[i][j].end.y);
-                ctx.stroke();   
-            }
-        } 
+        drawStoredLines(true, false);
     }
 }
 
@@ -388,100 +323,90 @@ redoButton.onclick = function()
 {
     if (!isRewriting && deletedLines.length != 0)
     {
-        storedLines.push(deletedLines.pop());
+        userData.storedLines.push(deletedLines.pop());
     
-        ctx.strokeStyle = selectedPageColour;
+        ctx.fillStyle = selectedPageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         ctx.drawImage(selectedBackground, 0, 0);
-        ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-        ctx.lineWidth = selectedPenWidth;
 
-        for (i = 0; i < storedLines.length; i++)
-        {
-            for(j = 0; j < storedLines[i].length; j++)
-            {
-                ctx.lineWidth = storedLines[i][j].penOptions.width;
-                ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j].penOptions.colour);
-                ctx.beginPath();        
-                ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
-                ctx.lineTo(storedLines[i][j].end.x, storedLines[i][j].end.y);
-                ctx.stroke();   
-            }
-        } 
+        drawStoredLines(true, false);
     }
 }
 
 rewriteButton.onclick = async function()
 {    
-    if (!isRewriting && storedLines.length != 0)
+    if (isRewriting || !userData.storedLines.length) {
+        return;
+    }
+    gtag('event', 'activate_rewrite', {
+        'loop_on': userData.userSettings.isLoopOn,
+        'trace_on': userData.userSettings.isTraceOn,
+        'selected_background': selectedBackground.src,
+        'show_pen': isShowingPen,
+        'write_speed_multiplier': speedMultiplier
+    });
+
+    isRewriting = true;
+    
+    do 
     {
-        gtag('event', 'activate_rewrite', {
-            'loop_on': isLooping,
-            'trace_on': isShowingTrace,
-            'selected_background': selectedBackground.src,
-            'show_pen': isShowingPen,
-            'write_speed_multiplier': speedMultiplier
-        });
-
-        isRewriting = true;
+        ctx.strokeStyle = selectedPageColour;
+        ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         
-        do 
+        if (userData.userSettings.isTraceOn)
         {
-            ctx.strokeStyle = selectedPageColour;
-            ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
-            
-            if (isShowingTrace)
-            {
-                for (i = 0; i < storedLines.length; i++)
-                {
-                    for(j = 0; j < storedLines[i].length; j++)
-                    {
-                        ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
-                        ctx.lineWidth = storedLines[i][j].penOptions.width;
-                        let baseColour = storedLines[i][j].penOptions.colour;
-                        ctx.strokeStyle = colourArrayToRGBString(faintColourArray(baseColour));
-                        ctx.beginPath();        
-                        ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
-                        ctx.lineTo(storedLines[i][j].end.y, storedLines[i][j].end.y);
-                        ctx.stroke();
-                    }
-                }
-            }
+            await drawStoredLines(true, true);
+        }
 
-            ctx.drawImage(selectedBackground, 0, 0);
+        ctx.drawImage(selectedBackground, 0, 0);
 
-            for (i = 0; i < storedLines.length; i++)
-            {
-                for(j = 0; j < storedLines[i].length; j++)
-                {
-                    ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
-                    ctx.lineWidth = storedLines[i][j].penOptions.width;
-                    ctx.strokeStyle = colourArrayToRGBString(storedLines[i][j].penOptions.colour);
-                    ctx.beginPath();        
-                    ctx.moveTo(storedLines[i][j].start.x, storedLines[i][j].start.y);
-                    ctx.lineTo(storedLines[i][j].end.x, storedLines[i][j].end.y);
-                    if (isShowingPen)
-                    {
-                        ctxMask.drawImage(selectedPenImage, storedLines[i][j].end.x, storedLines[i][j].end.y - selectedPenImage.height);
-                    }
-                    ctx.stroke();   
-            
-                    await new Promise(r => setTimeout(r, 50 / speedMultiplier));
-                }
+        await drawStoredLines();
+        
+        ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
 
-                await new Promise(r => setTimeout(r, 500 / speedMultiplier));
-            }
-            
+        if (userData.userSettings.isLoopOn)
+        {
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    } while (userData.userSettings.isLoopOn & isRewriting);
+
+    isRewriting = false;
+}
+
+async function drawStoredLines(instantDraw = false, traceDraw = false) {
+    for (let i = 0; i < userData.storedLines.length; i++)
+    {
+        for (let j = 0; j < userData.storedLines[i].length; j++)
+        {
             ctxMask.clearRect(0, 0, canvasWriterMask.width, canvasWriterMask.height);
+            ctx.lineWidth = userData.storedLines[i][j].penOptions.width;
 
-
-            if (isLooping)
-            {
-                await new Promise(r => setTimeout(r, 1000));
+            const baseColour = userData.storedLines[i][j].penOptions.colour;
+            if (traceDraw) {
+                ctx.strokeStyle = colourArrayToRGBString(faintColourArray(baseColour));
             }
-        } while (isLooping & isRewriting);
+            else {
+                ctx.strokeStyle = colourArrayToRGBString(baseColour);
+            }
 
-        isRewriting = false;
+            ctx.beginPath();        
+            ctx.moveTo(userData.storedLines[i][j].start.x, userData.storedLines[i][j].start.y);
+            ctx.lineTo(userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y);
+            
+            if (!instantDraw && isShowingPen)
+            {
+                ctxMask.drawImage(selectedPenImage, userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y - selectedPenImage.height);
+            }
+            ctx.stroke();   
+    
+            if (!instantDraw) {
+                await new Promise(r => setTimeout(r, 50 / speedMultiplier));
+            }
+        }
+
+        if (!instantDraw) {
+            await new Promise(r => setTimeout(r, 500 / speedMultiplier));
+        }
     }
 }
 
@@ -496,26 +421,12 @@ speedSlider.oninput = function()
 
 loopCheckbox.onchange = function()
 {
-    if (loopCheckbox.checked)
-    {
-        isLooping = true;
-    }
-    else
-    {
-        isLooping = false;
-    }
+    userData.userSettings.isLoopOn = loopCheckbox.checked ?? false; 
 }
 
 traceCheckbox.onchange = function()
 {
-    if (traceCheckbox.checked)
-    {
-        isShowingTrace = true;
-    }
-    else
-    {
-        isShowingTrace = false;
-    }
+    userData.userSettings.isTraceOn = traceCheckbox.checked ?? false; 
 }
 
 penCheckbox.onchange = function()
@@ -609,47 +520,11 @@ function drawEnd() {
         return;
     }
 
-    storedLines.push(currentLine.slice());
+    userData.storedLines.push(currentLine.slice());
     currentLine = [];
     penDown = false;
 
-    saveToLocalStorage();    
-}
-
-function saveToLocalStorage() {
-    if (!storageAvailable("localStorage")) {
-        return;
-    }
-
-    const userSettings = new UserSettings();
-    userSettings.loopOn = isLooping;
-    userSettings.traceOn = isShowingTrace;
-    userSettings.selectedPenImage = selectedPenImage;
-    userSettings.selectedPenColour = selectedPenColour;
-    userSettings.selectedPenWidth = selectedPenWidth;
-    userSettings.selectedBackground = selectedBackground;
-    userSettings.rewriteSpeed = rewriteSpeed;
-
-    const saveData = new StoredData(userSettings, storedLines);
-
-    const stringData = JSON.stringify(saveData);
-    localStorage.setItem("handwritingRepeater", stringData);
-}
-
-function loadFromLocalStorage() {
-    if (!storageAvailable("localStorage")) {
-        return;
-    }
-
-    const stringData = localStorage.getItem("handwritingRepeater");
-    if (!stringData) {
-        return;
-    }
-
-    let storedData = new StoredData();
-    storedData = JSON.parse(stringData);
-
-    // TODO
+    userData.saveToLocalStorage();    
 }
 
 document.addEventListener('touchmove', event => {
@@ -779,23 +654,3 @@ function getDateDisplayText()
         + months[date.getMonth()] + " "
         + date.getFullYear();
 }
-
-// Taken from https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
-function storageAvailable(type) {
-    let storage;
-    try {
-      storage = window[type];
-      const x = "__storage_test__";
-      storage.setItem(x, x);
-      storage.removeItem(x);
-      return true;
-    } catch (e) {
-      return (
-        e instanceof DOMException &&
-        e.name === "QuotaExceededError" &&
-        // acknowledge QuotaExceededError only if there's something already stored
-        storage &&
-        storage.length !== 0
-      );
-    }
-  }

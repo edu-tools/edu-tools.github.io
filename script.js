@@ -1,48 +1,66 @@
+class Point
+{
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class PenOptions
+{
+    constructor(colour = 'rgb(0, 0, 0)', width = 1) {
+        this.colour = colour;
+        this.width = width;
+    }
+}
+
+class DrawnLine
+{
+    constructor(start = new Point(), end = new Point(), penOptions = new PenOptions()) {
+        this.start = start;
+        this.end = end;
+        this.penOptions = penOptions;
+    }
+}
+
 // Selects canvasWriter element to draw on from page 
 var canvasWriter = document.getElementById("writer");
 
 // 
 var canvasWriterMask = document.getElementById("writerMask");
 
-let date = new Date();
 
-let weekday = new Array(7);
-weekday[0] = "Sunday";
-weekday[1] = "Monday";
-weekday[2] = "Tuesday";
-weekday[3] = "Wednesday";
-weekday[4] = "Thursday";
-weekday[5] = "Friday";
-weekday[6] = "Saturday";
+const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 
-let month = new Array(12);
-month[0] = "January";
-month[1] = "February";
-month[2] = "March";
-month[3] = "April";
-month[4] = "May";
-month[5] = "June";
-month[6] = "July";
-month[7] = "August";
-month[8] = "September";
-month[9] = "October";
-month[10] = "November";
-month[11] = "December";
+const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
 
-let dateString = "";
+const date = new Date();
 
-dateString += weekday[date.getDay()];
-dateString += ", ";
-
-let monthDay = date.getDate().toString();
-monthDay = dateSuffix(monthDay);
-
-dateString += monthDay;
-dateString += " ";
-dateString += month[date.getMonth()];
-dateString += " ";
-dateString += date.getFullYear();
-
+const dateString = days[date.getDay()] + ", "
+    + appendDateDaySuffix(date.getDate().toString()) + " "
+    + months[date.getMonth()]; + " "
+    + date.getFullYear();
 
 dateText.innerHTML = dateString;
 
@@ -149,16 +167,13 @@ let isShowingPen = true;
 let selectedPenImage = penImage;
 //
 
-let mouseX = 0;
-let mouseY = 0;
 let mouseHeld = false;
 
 let isRewriting = false;
 
 let isLooping = false;
 
-let originX = 0;
-let originY = 0; 
+let drawOrigin = new Point(0, 0);
 
 //
 let currentLine = [];
@@ -542,10 +557,13 @@ canvasWriter.addEventListener('touchstart', event =>
     if (!isRewriting)
     {        
         let bound = canvasWriter.getBoundingClientRect();
-        mouseX = event.clientX - bound.left - canvasWriter.clientLeft;
-        mouseY = event.clientY - bound.top - canvasWriter.clientTop;
+        
+        const mousePos = new Point(
+            event.clientX - bound.left - canvasWriter.clientLeft, 
+            event.clientY - bound.top - canvasWriter.clientTop
+        );
 
-        if (mouseX > 0 && mouseX < canvasWriter.width && mouseY > 0 && mouseY < canvasWriter.height)
+        if (mousePos.x > 0 && mousePos.x < canvasWriter.width && mousePos.y > 0 && mousePos.y < canvasWriter.height)
         {
             deletedLines = [];
 
@@ -553,14 +571,13 @@ canvasWriter.addEventListener('touchstart', event =>
             ctx.beginPath();        
             ctx.lineWidth = selectedPenWidth;
 
-            ctx.moveTo(mouseX, mouseY);
-            ctx.lineTo(mouseX, mouseY);
+            ctx.moveTo(mousePos.x, mousePos.y);
+            ctx.lineTo(mousePos.x, mousePos.y);
             ctx.stroke();
 
-            currentLine.push([mouseX, mouseY, mouseX, mouseY, selectedPenWidth, selectedPenColour]);
+            currentLine.push([mousePos.x, mousePos.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
 
-            originX = mouseX;
-            originY = mouseY;
+            drawOrigin = mousePos;
 
             mouseHeld = true;
         }
@@ -574,10 +591,13 @@ canvasWriter.addEventListener('mousedown', event =>
     if (!isRewriting)
     {        
         let bound = canvasWriter.getBoundingClientRect();
-        mouseX = event.clientX - bound.left - canvasWriter.clientLeft;
-        mouseY = event.clientY - bound.top - canvasWriter.clientTop;
 
-        if (mouseX > 0 && mouseX < canvasWriter.width && mouseY > 0 && mouseY < canvasWriter.height)
+        const mousePos = new Point(
+            event.clientX - bound.left - canvasWriter.clientLeft,
+            event.clientY - bound.top - canvasWriter.clientTop
+        );
+
+        if (mousePos.x > 0 && mousePos.x < canvasWriter.width && mousePos.y > 0 && mousePos.y < canvasWriter.height)
         {
             deletedLines = [];
 
@@ -586,14 +606,13 @@ canvasWriter.addEventListener('mousedown', event =>
      
             ctx.lineWidth = selectedPenWidth;
 
-            ctx.moveTo(mouseX, mouseY);
-            ctx.lineTo(mouseX, mouseY);
+            ctx.moveTo(mousePos.x, mousePos.y);
+            ctx.lineTo(mousePos.x, mousePos.y);
             ctx.stroke();
 
-            currentLine.push([mouseX, mouseY, mouseX, mouseY, selectedPenWidth, selectedPenColour]);
+            currentLine.push([mousePos.x, mousePos.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
 
-            originX = mouseX;
-            originY = mouseY;
+            drawOrigin = mousePos;
 
             mouseHeld = true;
         }
@@ -631,19 +650,20 @@ document.addEventListener('touchmove', event =>
         ctx.beginPath();        
         ctx.lineWidth = selectedPenWidth;
         ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
-        ctx.moveTo(originX, originY);
+        ctx.moveTo(drawOrigin.x, drawOrigin.y);
         let bound = canvasWriter.getBoundingClientRect();
 
-        mouseX = event.clientX - bound.left - canvasWriter.clientLeft;
-        mouseY = event.clientY - bound.top - canvasWriter.clientTop;
+        const mousePos = new Point(
+            event.clientX - bound.left - canvasWriter.clientLeft,
+            event.clientY - bound.top - canvasWriter.clientTop
+        );
 
-        currentLine.push([originX, originY, mouseX, mouseY, selectedPenWidth, selectedPenColour]);
+        currentLine.push([drawOrigin.x, drawOrigin.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
 
-        ctx.lineTo(mouseX, mouseY);
+        ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();
 
-        originX = mouseX;
-        originY = mouseY;
+        drawOrigin = mousePos;
         
     }
 });
@@ -657,19 +677,20 @@ document.addEventListener('mousemove', event =>
         ctx.beginPath();        
         ctx.lineWidth = selectedPenWidth;
 
-        ctx.moveTo(originX, originY);
+        ctx.moveTo(drawOrigin.x, drawOrigin.y);
         let bound = canvasWriter.getBoundingClientRect();
 
-        mouseX = event.clientX - bound.left - canvasWriter.clientLeft;
-        mouseY = event.clientY - bound.top - canvasWriter.clientTop;
+        const mousePos = new Point(
+            event.clientX - bound.left - canvasWriter.clientLeft,
+            event.clientY - bound.top - canvasWriter.clientTop
+        );
 
-        currentLine.push([originX, originY, mouseX, mouseY, selectedPenWidth, selectedPenColour]);
+        currentLine.push([drawOrigin.x, drawOrigin.y, mousePos.x, mousePos.y, selectedPenWidth, selectedPenColour]);
 
-        ctx.lineTo(mouseX, mouseY);
+        ctx.lineTo(mousePos.x, mousePos.y);
         ctx.stroke();
 
-        originX = mouseX;
-        originY = mouseY;
+        drawOrigin = mousePos;
         
     }
 });
@@ -714,7 +735,7 @@ function faintColourArray(colourArray)
     return colourArray.map(x => x + 3 * (255 - x) / 4);
 }
 
-function dateSuffix(dayString)
+function appendDateDaySuffix(dayString)
 {
     if (dayString.length == 2 && dayString[0] == '1')
     {

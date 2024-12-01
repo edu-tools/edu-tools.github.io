@@ -40,7 +40,7 @@ document.getElementById("dateText").innerHTML = getDateDisplayText();
 var canvasColour = document.getElementById("colourPickerCanvas");
 var ctxColourPicker = canvasColour.getContext('2d');
 let colourPickerImage = new Image();
-colourPickerImage.src = "colour-picker.png";
+colourPickerImage.src = "images/colour-picker.png";
 
 
 colourPickerImage.addEventListener('load', event => 
@@ -97,19 +97,19 @@ ctx.strokeStyle = colourArrayToRGBString([100, 110, 10]);
 
 // Load images
 let greyLineImage = new Image();
-greyLineImage.src = "grey-lines.png";
+greyLineImage.src = "images/grey-lines.png";
 let blueLineImage = new Image();
-blueLineImage.src = "blue-dotted-lines.png";
+blueLineImage.src = "images/blue-dotted-lines.png";
 let redBlueLineImage = new Image();
-redBlueLineImage.src = "red-blue-lines.png";
+redBlueLineImage.src = "images/red-blue-lines.png";
 let greyDottedLineImage = new Image();
-greyDottedLineImage.src = "grey-dotted-lines.png";
+greyDottedLineImage.src = "images/grey-dotted-lines.png";
 
 let quillImage = new Image();
-quillImage.src = "quill.svg";
+quillImage.src = "images/quill.svg";
 
 let penImage = new Image();
-penImage.src = "pen.svg";
+penImage.src = "images/pen.svg";
 
 let selectedBackground = blueLineImage;
 

@@ -1,30 +1,9 @@
 import { UserData } from "./UserData.js";
 import { Point } from "./Point.js";
-import { PenImage, BackgroundImage, PenWidth } from "./enums.js";
-
-class PenOptions
-{
-    colour = 'rgb(0, 0, 0)';
-    width = 1;
-
-    constructor(colour = 'rgb(0, 0, 0)', width = 1) {
-        this.colour = colour;
-        this.width = width;
-    }
-}
-
-class DrawnLine
-{
-    start = new Point();
-    end = new Point();
-    penOptions = new PenOptions();
-
-    constructor(start = new Point(), end = new Point(), penOptions = new PenOptions()) {
-        this.start = start;
-        this.end = end;
-        this.penOptions = penOptions;
-    }
-}
+import { PenWidth } from "./enums.js";
+import { DrawnLine } from "./DrawnLine.js";
+import { PenOptions } from "./PenOptions.js";
+import * as utils from "./utils.js";
 
 const userData = new UserData();
 userData.loadFromLocalStorage();
@@ -34,7 +13,7 @@ var canvasWriter = document.getElementById("writer");
 
 var canvasWriterMask = document.getElementById("writerMask");
 
-document.getElementById("dateText").innerHTML = getDateDisplayText();
+document.getElementById("dateText").innerHTML = utils.getDateDisplayText();
 
 // Selects colour picker canvasWriter and draws colour picker image
 var canvasColour = document.getElementById("colourPickerCanvas");
@@ -49,11 +28,11 @@ colourPickerImage.addEventListener('load', event =>
     canvasColour.height = colourPickerImage.height;
     ctxColourPicker.drawImage(colourPickerImage, 0, 0);
 
-    ctxColourPicker.fillStyle = colourArrayToRGBString([100,100,100]);
+    ctxColourPicker.fillStyle = utils.colourArrayToRGBString([100,100,100]);
     ctxColourPicker.clearRect(0, 0, 1000, 1000)
     
     ctxColourPicker.fillRect(0, 0, 36, 38);
-    ctxColourPicker.fillStyle = colourArrayToRGBString([135,206,250]);
+    ctxColourPicker.fillStyle = utils.colourArrayToRGBString([135,206,250]);
     ctxColourPicker.fillRect(2, 2, 32, 34);
     ctxColourPicker.drawImage(colourPickerImage, 0, 0);
 });
@@ -86,14 +65,12 @@ var ctx = canvasWriter.getContext('2d');
 var ctxMask = canvasWriterMask.getContext('2d');
 
 // Colours
-let defaultColour = colourArrayToRGBString([240, 240, 240]);
-
-let selectedPageColour = defaultColour;
+const pageColour = utils.colourArrayToRGBString([240, 240, 240]);
 
 
-ctx.fillStyle = selectedPageColour;
+ctx.fillStyle = pageColour;
 ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height)
-ctx.strokeStyle = colourArrayToRGBString([100, 110, 10]);
+ctx.strokeStyle = utils.colourArrayToRGBString([100, 110, 10]);
 
 // Load images
 let greyLineImage = new Image();
@@ -115,11 +92,8 @@ let selectedBackground = blueLineImage;
 
 selectedBackground.onload = () => { ctx.drawImage(selectedBackground, 0, 0); };
 
-let selectedPenWidth = PenWidth.Medium;
-
-ctx.lineWidth = selectedPenWidth;
+ctx.lineWidth = userData.userSettings.selectedPenWidth;
 ctx.lineCap = "round";
-let selectedPenColour = [0, 0, 0];
 
 let isShowingPen = true;
 let selectedPenImage = penImage;
@@ -142,22 +116,12 @@ let speedMultiplier = 0.1 * rewriteSpeed;
 
 writeSpeedText.textContent = "Write Speed: " + speedMultiplier + ".0";
 
-function getMousePos(e)
-{
-    let bound = canvasWriter.getBoundingClientRect();
-
-    let x = e.clientX - bound.left - canvasWriter.clientLeft;
-    let y = e.clientY - bound.top - canvasWriter.clientTop;
-
-    return [x, y];
-}
-
 function resetcanvasWriter(ctx)
 {
-    ctx.strokeStyle = selectedPageColour;
+    ctx.strokeStyle = pageColour;
     ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
     ctxMask.clearRect(0, 0, canvasWriter.width, canvasWriter.height);
-    ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
+    ctx.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
     ctx.drawImage(selectedBackground, 0, 0);
     isRewriting = false;
     deletedLines = [];
@@ -170,19 +134,19 @@ mediumPenButton.classList.add("pen-selected");
 
 smallPenButton.onclick = function()
 {
-    selectedPenWidth = PenWidth.Small;
+    userData.userSettings.selectedPenWidth = PenWidth.Small;
     selectedPenButton = 0;
     selectPenButton();
 }
 mediumPenButton.onclick = function()
 {
-    selectedPenWidth = PenWidth.Medium;
+    userData.userSettings.selectedPenWidth = PenWidth.Medium;
     selectedPenButton = 1;
     selectPenButton();
 }
 largePenButton.onclick = function()
 {
-    selectedPenWidth = PenWidth.Large;
+    userData.userSettings.selectedPenWidth = PenWidth.Large;
     selectedPenButton = 2;
     selectPenButton();
 }
@@ -311,7 +275,7 @@ undoButton.onclick = function()
     {
         deletedLines.push(userData.storedLines.pop());
     
-        ctx.fillStyle = selectedPageColour;
+        ctx.fillStyle = pageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         ctx.drawImage(selectedBackground, 0, 0);
 
@@ -325,7 +289,7 @@ redoButton.onclick = function()
     {
         userData.storedLines.push(deletedLines.pop());
     
-        ctx.fillStyle = selectedPageColour;
+        ctx.fillStyle = pageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         ctx.drawImage(selectedBackground, 0, 0);
 
@@ -350,7 +314,7 @@ rewriteButton.onclick = async function()
     
     do 
     {
-        ctx.strokeStyle = selectedPageColour;
+        ctx.strokeStyle = pageColour;
         ctx.fillRect(0, 0, canvasWriter.width, canvasWriter.height);
         
         if (userData.userSettings.isTraceOn)
@@ -383,10 +347,10 @@ async function drawStoredLines(instantDraw = false, traceDraw = false) {
 
             const baseColour = userData.storedLines[i][j].penOptions.colour;
             if (traceDraw) {
-                ctx.strokeStyle = colourArrayToRGBString(faintColourArray(baseColour));
+                ctx.strokeStyle = utils.colourArrayToRGBString(utils.faintColourArray(baseColour));
             }
             else {
-                ctx.strokeStyle = colourArrayToRGBString(baseColour);
+                ctx.strokeStyle = utils.colourArrayToRGBString(baseColour);
             }
 
             ctx.beginPath();        
@@ -488,15 +452,15 @@ function drawStart(event) {
             {
                 deletedLines = [];
     
-                ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
+                ctx.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
                 ctx.beginPath();        
-                ctx.lineWidth = selectedPenWidth;
+                ctx.lineWidth = userData.userSettings.selectedPenWidth;
     
                 ctx.moveTo(mousePos.x, mousePos.y);
                 ctx.lineTo(mousePos.x, mousePos.y);
                 ctx.stroke();
     
-                currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
+                currentLine.push(new DrawnLine(mousePos, mousePos, new PenOptions(userData.userSettings.selectedPenColour, userData.userSettings.selectedPenWidth)));
     
                 previousDrawPosition = mousePos;
     
@@ -542,9 +506,9 @@ document.addEventListener('mousemove', event => {
 });
 
 function drawMove(event) {
-    ctx.strokeStyle = colourArrayToRGBString(selectedPenColour);
+    ctx.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
     ctx.beginPath();        
-    ctx.lineWidth = selectedPenWidth;
+    ctx.lineWidth = userData.userSettings.selectedPenWidth;
 
     ctx.moveTo(previousDrawPosition.x, previousDrawPosition.y);
     let bound = canvasWriter.getBoundingClientRect();
@@ -554,7 +518,7 @@ function drawMove(event) {
         event.clientY - bound.top - canvasWriter.clientTop
     );
 
-    currentLine.push(new DrawnLine(previousDrawPosition, mousePos, new PenOptions(selectedPenColour, selectedPenWidth)));
+    currentLine.push(new DrawnLine(previousDrawPosition, mousePos, new PenOptions(userData.userSettings.selectedPenColour, userData.userSettings.selectedPenWidth)));
 
     ctx.lineTo(mousePos.x, mousePos.y);
     ctx.stroke();
@@ -581,76 +545,13 @@ function changePenColour(event)
     let pickedColour = Array.from(ctxColourPicker.getImageData(event.offsetX, colourPickerImage.height / 2, 1, 1).data);
     if (pickedColour.length != 0)
     {
-        selectedPenColour = pickedColour; 
-        ctxColourPicker.fillStyle = colourArrayToRGBString([100,100,100]);
+        userData.userSettings.selectedPenColour = pickedColour; 
+        ctxColourPicker.fillStyle = utils.colourArrayToRGBString([100,100,100]);
         ctxColourPicker.clearRect(0, 0, 1000, 1000)
         
         ctxColourPicker.fillRect(Math.floor(event.offsetX/36) * 36, 0, 36, 38);
-        ctxColourPicker.fillStyle = colourArrayToRGBString([135,206,250]);
+        ctxColourPicker.fillStyle = utils.colourArrayToRGBString([135,206,250]);
         ctxColourPicker.fillRect(Math.floor(event.offsetX/36) * 36 + 2, 2, 32, 34);
         ctxColourPicker.drawImage(colourPickerImage, 0, 0);
     }
-}
-
-function colourArrayToRGBString(colourArray)
-{
-    return "rgb(" + colourArray[0] + "," + colourArray[1] + "," + colourArray[2] + ")";
-}
-
-function faintColourArray(colourArray)
-{
-    return colourArray.map(x => x + 3 * (255 - x) / 4);
-}
-
-function appendDateDaySuffix(dayString)
-{
-    switch (dayString) {
-        case "1":
-        case "21":
-        case "31":
-            return dayString + "st";
-        case "2":
-        case "22":
-            return dayString + "nd";
-        case "3":
-        case "23":
-            return dayString + "rd";
-        default:
-            return dayString + "th";
-    }
-}
-
-function getDateDisplayText()
-{
-    const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
-    
-    const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-    
-    const date = new Date();
-    
-    return days[date.getDay()] + ", "
-        + appendDateDaySuffix(date.getDate().toString()) + " "
-        + months[date.getMonth()] + " "
-        + date.getFullYear();
 }

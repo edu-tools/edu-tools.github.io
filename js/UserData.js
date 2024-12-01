@@ -1,7 +1,6 @@
 import { PenImage, BackgroundImage, PenWidth } from "./enums.js";
 
-export class UserData
-{
+export class UserData {
     userSettings = new UserSettings();
     storedLines = [];
 
@@ -37,14 +36,13 @@ export class UserData
     }
 }
 
-class UserSettings
-{
+class UserSettings {
     isLoopOn = false;
     isTraceOn = false;
-    selectedPenImage = PenImage.Marker;
+    selectedPenImage = PenImage;
     selectedPenColour = [0, 0, 0];
-    selectedPenWidth = 10;
-    selectedBackground = "BlueDottedLines";
+    selectedPenWidth = PenWidth.Medium;
+    selectedBackground = BackgroundImage.BlueDottedLines;
     rewriteSpeed = 2;
 }
 

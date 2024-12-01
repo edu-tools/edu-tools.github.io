@@ -4,7 +4,7 @@ export class UserData {
     userSettings = new UserSettings();
     storedLines = [];
 
-    constructor(userSettings, storedLines = []) {
+    constructor(userSettings = new UserSettings(), storedLines = []) {
         this.userSettings = userSettings;
         this.storedLines = storedLines;
     }

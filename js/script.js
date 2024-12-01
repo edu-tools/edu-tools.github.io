@@ -6,20 +6,21 @@ import { DrawnLine } from "./DrawnLine.js";
 import { PenOptions } from "./PenOptions.js";
 import * as utils from "./utils.js";
 
-const controls = new Controls(document);
 const userData = new UserData();
 userData.loadFromLocalStorage();
 
+const controls = new Controls(userData);
+
 controls.dateText.innerHTML = utils.getDateDisplayText();
 
-const colourPickerContext = canvasColour.getContext('2d');
+const colourPickerContext = controls.colourPickerCanvas.getContext('2d');
 const colourPickerImage = new Image();
 colourPickerImage.src = "images/colour-picker.png";
 
 colourPickerImage.addEventListener('load', event => 
 {
-    canvasColour.width = colourPickerImage.width;
-    canvasColour.height = colourPickerImage.height;
+    controls.colourPickerCanvas.width = colourPickerImage.width;
+    controls.colourPickerCanvas.height = colourPickerImage.height;
     colourPickerContext.drawImage(colourPickerImage, 0, 0);
 
     colourPickerContext.fillStyle = utils.colourArrayToRGBString([100,100,100]);
@@ -81,12 +82,6 @@ let previousDrawPosition = new Point(0, 0);
 let currentLine = [];
 let deletedLines = [];
 //
-
-let rewriteSpeed = controls.speedSlider.value;
-
-let speedMultiplier = 0.1 * rewriteSpeed;
-
-controls.writeSpeedText.textContent = "Write Speed: " + speedMultiplier + ".0";
 
 function resetcanvasWriter(ctx)
 {
@@ -278,7 +273,7 @@ controls.rewriteButton.onclick = async function()
         'trace_on': userData.userSettings.isTraceOn,
         'selected_background': selectedBackground.src,
         'show_pen': isShowingPen,
-        'write_speed_multiplier': speedMultiplier
+        'write_speed_multiplier': userData.userSettings.rewriteSpeed
     });
 
     isRewriting = true;
@@ -335,23 +330,20 @@ async function drawStoredLines(instantDraw = false, traceDraw = false) {
             rewriterContext.stroke();   
     
             if (!instantDraw) {
-                await new Promise(r => setTimeout(r, 50 / speedMultiplier));
+                await new Promise(r => setTimeout(r, 50 / userData.userSettings.rewriteSpeed));
             }
         }
 
         if (!instantDraw) {
-            await new Promise(r => setTimeout(r, 500 / speedMultiplier));
+            await new Promise(r => setTimeout(r, 500 / userData.userSettings.rewriteSpeed));
         }
     }
 }
 
 controls.speedSlider.oninput = function()
 {
-    rewriteSpeed = controls.speedSlider.value;
-    speedMultiplier = 0.1 * rewriteSpeed;
-    speedMultiplier = speedMultiplier.toFixed(1);
-
-    controls.writeSpeedText.textContent = "Write Speed: " + speedMultiplier;
+    userData.userSettings.rewriteSpeed = controls.speedSlider.value * 1;
+    controls.writeSpeedText.textContent = "Write Speed: " + userData.userSettings.rewriteSpeed.toFixed(1);
 }
 
 controls.loopCheckbox.onchange = function()

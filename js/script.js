@@ -11,27 +11,6 @@ userData.loadFromLocalStorage();
 
 const controls = new Controls(userData);
 
-controls.dateText.innerHTML = utils.getDateDisplayText();
-
-const colourPickerContext = controls.colourPickerCanvas.getContext('2d');
-const colourPickerImage = new Image();
-colourPickerImage.src = "images/colour-picker.png";
-
-colourPickerImage.addEventListener('load', event => 
-{
-    controls.colourPickerCanvas.width = colourPickerImage.width;
-    controls.colourPickerCanvas.height = colourPickerImage.height;
-    colourPickerContext.drawImage(colourPickerImage, 0, 0);
-
-    colourPickerContext.fillStyle = utils.colourArrayToRGBString([100,100,100]);
-    colourPickerContext.clearRect(0, 0, 1000, 1000)
-    
-    colourPickerContext.fillRect(0, 0, 36, 38);
-    colourPickerContext.fillStyle = utils.colourArrayToRGBString([135,206,250]);
-    colourPickerContext.fillRect(2, 2, 32, 34);
-    colourPickerContext.drawImage(colourPickerImage, 0, 0);
-});
-
 var rewriterContext = controls.rewriterCanvas.getContext('2d');
 var rewriterMaskContext = controls.rewriterMaskCanvas.getContext('2d');
 
@@ -94,53 +73,19 @@ function resetcanvasWriter(ctx)
     deletedLines = [];
 }
 
-// Pen options buttons
-let selectedPenButton = 1;
-controls.mediumPenButton.classList.add("pen-selected");
-
-controls.smallPenButton.onclick = function()
-{
+controls.smallPenButton.addEventListener('click', () => {
     userData.userSettings.selectedPenWidth = PenWidth.Small;
-    selectedPenButton = 0;
-    selectPenButton();
-}
-controls.mediumPenButton.onclick = function()
-{
+    utils.updatePenWidthSelectedButton(controls, userData);
+});
+controls.mediumPenButton.addEventListener('click', () => {
     userData.userSettings.selectedPenWidth = PenWidth.Medium;
-    selectedPenButton = 1;
-    selectPenButton();
-}
-controls.largePenButton.onclick = function()
-{
+    utils.updatePenWidthSelectedButton(controls, userData);
+});
+controls.largePenButton.addEventListener('click', () => {
     userData.userSettings.selectedPenWidth = PenWidth.Large;
-    selectedPenButton = 2;
-    selectPenButton();
-}
+    utils.updatePenWidthSelectedButton(controls, userData);
+});
 
-function selectPenButton() 
-{
-    if (selectedPenButton == 0)
-    {
-        controls.smallPenButton.classList.remove("pen-selected");
-        controls.mediumPenButton.classList.remove("pen-selected");
-        controls.largePenButton.classList.remove("pen-selected");
-        controls.smallPenButton.classList.add("pen-selected");
-    }
-    else if (selectedPenButton == 1)
-    {
-        controls.smallPenButton.classList.remove("pen-selected");
-        controls.mediumPenButton.classList.remove("pen-selected");
-        controls.largePenButton.classList.remove("pen-selected");
-        controls.mediumPenButton.classList.add("pen-selected");
-    }
-    else if (selectedPenButton == 2)
-    {
-        controls.smallPenButton.classList.remove("pen-selected");
-        controls.mediumPenButton.classList.remove("pen-selected");
-        controls.largePenButton.classList.remove("pen-selected");
-        controls.largePenButton.classList.add("pen-selected");
-    }
-}
 
 // Page background buttons
 let selectedPageButton = 0;

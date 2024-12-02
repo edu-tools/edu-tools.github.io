@@ -1,4 +1,6 @@
+import { PenImage } from "./enums.js";
 import { UserData } from "./UserData.js";
+import * as utils from "./utils.js";
 
 export class Controls {
 
@@ -32,8 +34,6 @@ export class Controls {
     colourPickerCanvas;
 
     constructor(userData = new UserData()) {
-        this.userData = userData;
-
         this.dateText = this.addControl("dateText", userData);
 
         this.rewriterCanvas = this.addControl("writer", userData);
@@ -62,21 +62,54 @@ export class Controls {
         this.backgroundButton4 = this.addControl("backgroundButton4", userData);
     
         this.colourPickerCanvas = this.addControl("colourPickerCanvas", userData);
-
+        
         this.initialiseControlsFromUserData(userData);
+        
+        this.dateText.innerHTML = utils.getDateDisplayText();
     }
 
     addControl(elementId = "", userData = new UserData()) {
         const element = document.getElementById(elementId);
         element.addEventListener('click', async () => {
-            await new Promise(r => setTimeout(r, 1000)); 
+            await new Promise(r => setTimeout(r, 1000));
             userData.saveToLocalStorage();
         });
         return element;
     }
 
     initialiseControlsFromUserData(userData = new UserData()) {
+        
         this.speedSlider.value = userData.userSettings.rewriteSpeed;
         this.writeSpeedText.textContent = "Write Speed: " + userData.userSettings.rewriteSpeed.toFixed(1);
+        this.initialiseColourPicker(userData);
+        this.intialiseSelectedPenSize(userData);
+        // todo initialiseBackground
+        this.loopCheckbox.checked = userData.userSettings.isLoopOn == true;
+        this.traceCheckbox.checked = userData.userSettings.isTraceOn == true;
+        this.penCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Marker;
+        this.quillCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Quill;
+    }
+
+    initialiseColourPicker(userData = new UserData()) {
+        const colourPickerContext = this.colourPickerCanvas.getContext('2d');
+        const colourPickerImage = new Image();
+        colourPickerImage.src = "images/colour-picker.png";
+        colourPickerImage.addEventListener('load', event => {
+            this.colourPickerCanvas.width = colourPickerImage.width;
+            this.colourPickerCanvas.height = colourPickerImage.height;
+            colourPickerContext.drawImage(colourPickerImage, 0, 0);
+        
+            colourPickerContext.fillStyle = utils.colourArrayToRGBString([100,100,100]);
+            colourPickerContext.clearRect(0, 0, 1000, 1000)
+            
+            colourPickerContext.fillRect(0, 0, 36, 38);
+            colourPickerContext.fillStyle = utils.colourArrayToRGBString([135,206,250]);
+            colourPickerContext.fillRect(2, 2, 32, 34);
+            colourPickerContext.drawImage(colourPickerImage, 0, 0);
+        });
+    }
+
+    intialiseSelectedPenSize(userData = new UserData()) {
+        utils.updatePenWidthSelectedButton(this, userData);
     }
 }

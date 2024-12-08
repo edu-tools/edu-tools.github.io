@@ -14,15 +14,12 @@ var rewriterPageContext = controls.rewriterPageCanvas.getContext('2d');
 var rewriterTraceContext = controls.rewriterTraceCanvas.getContext('2d');
 var rewriterLinesContext = controls.rewriterLinesCanvas.getContext('2d');
 var rewriterContext = controls.rewriterCanvas.getContext('2d');
+rewriterContext.lineCap = "round";
 var rewriterMaskContext = controls.rewriterMaskCanvas.getContext('2d');
 
 // Colours
 const pageColour = utils.colourArrayToRGBString([240, 240, 240]);
 
-rewriterContext.strokeStyle = utils.colourArrayToRGBString([100, 110, 10]);
-rewriterContext.lineWidth = userData.userSettings.selectedPenWidth;
-rewriterContext.lineCap = "round";
-rewriterTraceContext.lineCap = "round";
 await drawStoredLines(rewriterContext, true, false);
 
 // Load images
@@ -72,7 +69,6 @@ function resetcanvasWriter()
     rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height);
     rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
     rewriterContext.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
-    isRewriting = false;
     deletedLines = [];
 }
 
@@ -110,18 +106,18 @@ controls.resetButton.onclick = function() {
 
 controls.undoButton.onclick = async function()
 {
-    if (!isRewriting && deletedLines.length < 100 && userData.storedLines.length > 0)
-    {
-        deletedLines.push(userData.storedLines.pop());    
+    if (!isRewriting && deletedLines.length < 100 && userData.storedLines.length > 0) {
+        deletedLines.push(userData.storedLines.pop());
+        rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
         await drawStoredLines(rewriterContext, true, false);
     }
 }
 
 controls.redoButton.onclick = async function()
 {
-    if (!isRewriting && deletedLines.length != 0)
-    {
+    if (!isRewriting && deletedLines.length != 0) {
         userData.storedLines.push(deletedLines.pop());    
+        rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
         await drawStoredLines(rewriterContext, true, false);
     }
 }
@@ -151,10 +147,11 @@ async function rewrite(signal = new AbortSignal()) {
 
     isRewriting = true;
     
-    rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
-    rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height);
     do 
-    {
+    {        
+        rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
+        rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height);
+
         if (userData.userSettings.isTraceOn)
         {
             await drawStoredLines(rewriterTraceContext, true, true, signal);
@@ -176,10 +173,13 @@ async function rewrite(signal = new AbortSignal()) {
 
     isRewriting = false;
     rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
+    rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height);
     await drawStoredLines(rewriterContext, true, false, undefined);
 }
 
 async function drawStoredLines(ctx, instantDraw = false, traceDraw = false, abortSignal = undefined) {
+
+    ctx.lineCap = "round";
 
     for (let i = 0; i < userData.storedLines.length; i++) {
         if (abortSignal?.aborted) {
@@ -187,7 +187,6 @@ async function drawStoredLines(ctx, instantDraw = false, traceDraw = false, abor
         }
 
         for (let j = 0; j < userData.storedLines[i].length; j++) {
-            rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
             
             if (abortSignal?.aborted) {
                 return;
@@ -207,9 +206,11 @@ async function drawStoredLines(ctx, instantDraw = false, traceDraw = false, abor
             ctx.moveTo(userData.storedLines[i][j].start.x, userData.storedLines[i][j].start.y);
             ctx.lineTo(userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y);
             
-            if (!instantDraw && isShowingPen)
-            {
-                rewriterMaskContext.drawImage(selectedPenImage, userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y - selectedPenImage.height);
+            if (!instantDraw) {
+                rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
+                if (isShowingPen) {
+                    rewriterMaskContext.drawImage(selectedPenImage, userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y - selectedPenImage.height);
+                }
             }
             ctx.stroke();   
     
@@ -225,6 +226,14 @@ async function drawStoredLines(ctx, instantDraw = false, traceDraw = false, abor
         if (!instantDraw) {
             await new Promise(r => setTimeout(r, 500 / userData.userSettings.rewriteSpeed));
         }
+    }
+}
+
+controls.traceCheckbox.onchange = async () => {
+    
+    rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height)
+    if (controls.traceCheckbox.checked) {
+        await drawStoredLines(rewriterTraceContext, true, true);
     }
 }
 

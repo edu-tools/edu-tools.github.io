@@ -7,6 +7,8 @@ export class Controls {
     dateText;
 
     rewriterPageCanvas;
+    rewriterTraceCanvas;
+    rewriterLinesCanvas;
     rewriterCanvas;
     rewriterMaskCanvas;
 
@@ -39,6 +41,8 @@ export class Controls {
         this.dateText = this.addControl("dateText", userData);
 
         this.rewriterPageCanvas = this.addControl("writerPage", userData);
+        this.rewriterTraceCanvas = this.addControl("writerTrace", userData);
+        this.rewriterLinesCanvas = this.addControl("writerLines", userData);
         this.rewriterCanvas = this.addControl("writer", userData);
         this.rewriterMaskCanvas = this.addControl("writerMask", userData);
 

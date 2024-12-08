@@ -93,6 +93,20 @@ button:hover {
     touch-action: none;
 }
 
+#writerTrace {
+    grid-row-start: 1;
+    grid-column-start: 1;
+    pointer-events: none;
+    touch-action: none;
+}
+
+#writerLines {
+    grid-row-start: 1;
+    grid-column-start: 1;
+    pointer-events: none;
+    touch-action: none;
+}
+
 #writerMask {
     grid-row-start: 1;
     grid-column-start: 1;

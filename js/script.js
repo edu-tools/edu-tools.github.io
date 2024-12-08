@@ -11,6 +11,8 @@ userData.loadFromLocalStorage();
 const controls = new Controls(userData);
 
 var rewriterPageContext = controls.rewriterPageCanvas.getContext('2d');
+var rewriterTraceContext = controls.rewriterTraceCanvas.getContext('2d');
+var rewriterLinesContext = controls.rewriterLinesCanvas.getContext('2d');
 var rewriterContext = controls.rewriterCanvas.getContext('2d');
 var rewriterMaskContext = controls.rewriterMaskCanvas.getContext('2d');
 
@@ -20,7 +22,8 @@ const pageColour = utils.colourArrayToRGBString([240, 240, 240]);
 rewriterContext.strokeStyle = utils.colourArrayToRGBString([100, 110, 10]);
 rewriterContext.lineWidth = userData.userSettings.selectedPenWidth;
 rewriterContext.lineCap = "round";
-drawStoredLines(true, false);
+rewriterTraceContext.lineCap = "round";
+await drawStoredLines(rewriterContext, true, false);
 
 // Load images
 let greyLineImage = new Image();
@@ -43,7 +46,8 @@ let selectedBackground = blueLineImage;
 selectedBackground.onload = () => {
     rewriterPageContext.fillStyle = pageColour;
     rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
-    rewriterPageContext.drawImage(selectedBackground, 0, 0);
+    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
+    rewriterLinesContext.drawImage(selectedBackground, 0, 0);
 };
 
 
@@ -62,11 +66,12 @@ let currentLine = [];
 let deletedLines = [];
 //
 
-function resetcanvasWriter(ctx)
+function resetcanvasWriter()
 {
-    rewriterMaskContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
+    rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
+    rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height);
     rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
-    ctx.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
+    rewriterContext.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
     isRewriting = false;
     deletedLines = [];
 }
@@ -74,54 +79,50 @@ function resetcanvasWriter(ctx)
 controls.backgroundButton1.onclick = function()
 {
     selectedBackground = blueLineImage;
-    rewriterPageContext.fillStyle = pageColour;
-    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
-    rewriterPageContext.drawImage(selectedBackground, 0, 0);
+    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
+    rewriterLinesContext.drawImage(selectedBackground, 0, 0);
 }
 controls.backgroundButton2.onclick = function()
 {
     selectedBackground = greyDottedLineImage;
-    rewriterPageContext.fillStyle = pageColour;
-    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
-    rewriterPageContext.drawImage(selectedBackground, 0, 0);
+    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
+    rewriterLinesContext.drawImage(selectedBackground, 0, 0);
 }
 controls.backgroundButton3.onclick = function()
 {
     selectedBackground = redBlueLineImage;
-    rewriterPageContext.fillStyle = pageColour;
-    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
-    rewriterPageContext.drawImage(selectedBackground, 0, 0);
+    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
+    rewriterLinesContext.drawImage(selectedBackground, 0, 0);
 }
 controls.backgroundButton4.onclick = function()
 {
     selectedBackground = greyLineImage;
-    rewriterPageContext.fillStyle = pageColour;
-    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
-    rewriterPageContext.drawImage(selectedBackground, 0, 0);
+    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
+    rewriterLinesContext.drawImage(selectedBackground, 0, 0);
 }
 
 // Bottom controls
 controls.resetButton.onclick = function() {
     controller?.abort();
-    resetcanvasWriter(rewriterContext);
+    resetcanvasWriter();
     userData.storedLines = [];
 }
 
-controls.undoButton.onclick = function()
+controls.undoButton.onclick = async function()
 {
     if (!isRewriting && deletedLines.length < 100 && userData.storedLines.length > 0)
     {
         deletedLines.push(userData.storedLines.pop());    
-        drawStoredLines(true, false);
+        await drawStoredLines(rewriterContext, true, false);
     }
 }
 
-controls.redoButton.onclick = function()
+controls.redoButton.onclick = async function()
 {
     if (!isRewriting && deletedLines.length != 0)
     {
         userData.storedLines.push(deletedLines.pop());    
-        drawStoredLines(true, false);
+        await drawStoredLines(rewriterContext, true, false);
     }
 }
 let controller = new AbortController();
@@ -150,14 +151,16 @@ async function rewrite(signal = new AbortSignal()) {
 
     isRewriting = true;
     
+    rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
+    rewriterTraceContext.clearRect(0, 0, controls.rewriterTraceCanvas.width, controls.rewriterTraceCanvas.height);
     do 
     {
         if (userData.userSettings.isTraceOn)
         {
-            await drawStoredLines(true, true, signal);
+            await drawStoredLines(rewriterTraceContext, true, true, signal);
         }
 
-        await drawStoredLines(false, false, signal);
+        await drawStoredLines(rewriterContext, false, false, signal);
 
         rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
         
@@ -173,10 +176,11 @@ async function rewrite(signal = new AbortSignal()) {
 
     isRewriting = false;
     rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
-    await drawStoredLines(true, false, undefined);
+    await drawStoredLines(rewriterContext, true, false, undefined);
 }
 
-async function drawStoredLines(instantDraw = false, traceDraw = false, abortSignal = undefined) {
+async function drawStoredLines(ctx, instantDraw = false, traceDraw = false, abortSignal = undefined) {
+
     for (let i = 0; i < userData.storedLines.length; i++) {
         if (abortSignal?.aborted) {
             return;
@@ -189,25 +193,25 @@ async function drawStoredLines(instantDraw = false, traceDraw = false, abortSign
                 return;
             }
             
-            rewriterContext.lineWidth = userData.storedLines[i][j].penOptions.width;
+            ctx.lineWidth = userData.storedLines[i][j].penOptions.width;
 
             const baseColour = userData.storedLines[i][j].penOptions.colour;
             if (traceDraw) {
-                rewriterContext.strokeStyle = utils.colourArrayToRGBString(utils.faintColourArray(baseColour));
+                ctx.strokeStyle = utils.colourArrayToRGBString(utils.faintColourArray(baseColour));
             }
             else {
-                rewriterContext.strokeStyle = utils.colourArrayToRGBString(baseColour);
+                ctx.strokeStyle = utils.colourArrayToRGBString(baseColour);
             }
 
-            rewriterContext.beginPath();        
-            rewriterContext.moveTo(userData.storedLines[i][j].start.x, userData.storedLines[i][j].start.y);
-            rewriterContext.lineTo(userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y);
+            ctx.beginPath();        
+            ctx.moveTo(userData.storedLines[i][j].start.x, userData.storedLines[i][j].start.y);
+            ctx.lineTo(userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y);
             
             if (!instantDraw && isShowingPen)
             {
                 rewriterMaskContext.drawImage(selectedPenImage, userData.storedLines[i][j].end.x, userData.storedLines[i][j].end.y - selectedPenImage.height);
             }
-            rewriterContext.stroke();   
+            ctx.stroke();   
     
             if (!instantDraw) {
                 await new Promise(r => setTimeout(r, 50 / userData.userSettings.rewriteSpeed));

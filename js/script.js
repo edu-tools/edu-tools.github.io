@@ -1,7 +1,6 @@
 import { UserData } from "./UserData.js";
 import { Controls } from "./Controls.js";
 import { Point } from "./Point.js";
-import { PenWidth } from "./enums.js";
 import { DrawnLine } from "./DrawnLine.js";
 import { PenOptions } from "./PenOptions.js";
 import * as utils from "./utils.js";
@@ -11,15 +10,17 @@ userData.loadFromLocalStorage();
 
 const controls = new Controls(userData);
 
+var rewriterPageContext = controls.rewriterPageCanvas.getContext('2d');
 var rewriterContext = controls.rewriterCanvas.getContext('2d');
 var rewriterMaskContext = controls.rewriterMaskCanvas.getContext('2d');
 
 // Colours
 const pageColour = utils.colourArrayToRGBString([240, 240, 240]);
 
-rewriterContext.fillStyle = pageColour;
-rewriterContext.fillRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height)
 rewriterContext.strokeStyle = utils.colourArrayToRGBString([100, 110, 10]);
+rewriterContext.lineWidth = userData.userSettings.selectedPenWidth;
+rewriterContext.lineCap = "round";
+drawStoredLines(true, false);
 
 // Load images
 let greyLineImage = new Image();
@@ -39,13 +40,12 @@ penImage.src = "images/pen.svg";
 
 let selectedBackground = blueLineImage;
 
-selectedBackground.onload = () => { 
-    rewriterContext.drawImage(selectedBackground, 0, 0);
-    drawStoredLines(true, false);
+selectedBackground.onload = () => {
+    rewriterPageContext.fillStyle = pageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
+    rewriterPageContext.drawImage(selectedBackground, 0, 0);
 };
 
-rewriterContext.lineWidth = userData.userSettings.selectedPenWidth;
-rewriterContext.lineCap = "round";
 
 let isShowingPen = true;
 let selectedPenImage = penImage;
@@ -64,118 +64,45 @@ let deletedLines = [];
 
 function resetcanvasWriter(ctx)
 {
-    ctx.strokeStyle = pageColour;
-    ctx.fillRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
     rewriterMaskContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
+    rewriterContext.clearRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
     ctx.strokeStyle = utils.colourArrayToRGBString(userData.userSettings.selectedPenColour);
-    ctx.drawImage(selectedBackground, 0, 0);
     isRewriting = false;
     deletedLines = [];
 }
 
-controls.smallPenButton.addEventListener('click', () => {
-    userData.userSettings.selectedPenWidth = PenWidth.Small;
-    utils.updatePenWidthSelectedButton(controls, userData);
-});
-controls.mediumPenButton.addEventListener('click', () => {
-    userData.userSettings.selectedPenWidth = PenWidth.Medium;
-    utils.updatePenWidthSelectedButton(controls, userData);
-});
-controls.largePenButton.addEventListener('click', () => {
-    userData.userSettings.selectedPenWidth = PenWidth.Large;
-    utils.updatePenWidthSelectedButton(controls, userData);
-});
-
-
-// Page background buttons
-let selectedPageButton = 0;
-controls.backgroundButton1.classList.add("pen-selected");
-
-
 controls.backgroundButton1.onclick = function()
 {
     selectedBackground = blueLineImage;
-    resetcanvasWriter(rewriterContext);
-    userData.storedLines = [];
-    selectedPageButton = 0;
-    selectPageButton();
+    rewriterPageContext.fillStyle = pageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
+    rewriterPageContext.drawImage(selectedBackground, 0, 0);
 }
 controls.backgroundButton2.onclick = function()
 {
     selectedBackground = greyDottedLineImage;
-    resetcanvasWriter(rewriterContext);
-    userData.storedLines = [];
-    selectedPageButton = 1;
-    selectPageButton();
+    rewriterPageContext.fillStyle = pageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
+    rewriterPageContext.drawImage(selectedBackground, 0, 0);
 }
 controls.backgroundButton3.onclick = function()
 {
     selectedBackground = redBlueLineImage;
-    resetcanvasWriter(rewriterContext);
-    userData.storedLines = [];
-    selectedPageButton = 2;
-    selectPageButton();
+    rewriterPageContext.fillStyle = pageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
+    rewriterPageContext.drawImage(selectedBackground, 0, 0);
 }
 controls.backgroundButton4.onclick = function()
 {
     selectedBackground = greyLineImage;
-    resetcanvasWriter(rewriterContext);
-    userData.storedLines = [];
-    selectedPageButton = 3;
-    selectPageButton();
-}
-
-controls.collapsePenOptionsButton.onclick = function()
-{
-    document.querySelector('#penOptions').classList.toggle('collapse');
-    controls.collapsePenOptionsButton.classList.toggle("collapse-button-collapsed");
-}
-
-controls.collapsePageOptionsButton.onclick = function()
-{
-    document.querySelector('#pageOptions').classList.toggle('collapse');
-    controls.collapsePageOptionsButton.classList.toggle("collapse-button-collapsed");
-}
-
-function selectPageButton() 
-{
-    if (selectedPageButton == 0)
-    {
-        controls.backgroundButton1.classList.remove("pen-selected");
-        controls.backgroundButton2.classList.remove("pen-selected");
-        controls.backgroundButton3.classList.remove("pen-selected");
-        controls.backgroundButton4.classList.remove("pen-selected");
-        controls.backgroundButton1.classList.add("pen-selected");
-    }
-    else if (selectedPageButton == 1)
-    {
-        controls.backgroundButton1.classList.remove("pen-selected");
-        controls.backgroundButton2.classList.remove("pen-selected");
-        controls.backgroundButton3.classList.remove("pen-selected");
-        controls.backgroundButton4.classList.remove("pen-selected");
-        controls.backgroundButton2.classList.add("pen-selected");
-    }
-    else if (selectedPageButton == 2)
-    {
-        controls.backgroundButton1.classList.remove("pen-selected");
-        controls.backgroundButton2.classList.remove("pen-selected");
-        controls.backgroundButton3.classList.remove("pen-selected");
-        controls.backgroundButton4.classList.remove("pen-selected");
-        controls.backgroundButton3.classList.add("pen-selected");
-    }
-    else if (selectedPageButton == 3)
-    {
-        controls.backgroundButton1.classList.remove("pen-selected");
-        controls.backgroundButton2.classList.remove("pen-selected");
-        controls.backgroundButton3.classList.remove("pen-selected");
-        controls.backgroundButton4.classList.remove("pen-selected");
-        controls.backgroundButton4.classList.add("pen-selected");
-    }
+    rewriterPageContext.fillStyle = pageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height); 
+    rewriterPageContext.drawImage(selectedBackground, 0, 0);
 }
 
 // Bottom controls
-controls.resetButton.onclick = function()
-{
+controls.resetButton.onclick = function() {
+    controller?.abort();
     resetcanvasWriter(rewriterContext);
     userData.storedLines = [];
 }
@@ -184,12 +111,7 @@ controls.undoButton.onclick = function()
 {
     if (!isRewriting && deletedLines.length < 100 && userData.storedLines.length > 0)
     {
-        deletedLines.push(userData.storedLines.pop());
-    
-        rewriterContext.fillStyle = pageColour;
-        rewriterContext.fillRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
-        rewriterContext.drawImage(selectedBackground, 0, 0);
-
+        deletedLines.push(userData.storedLines.pop());    
         drawStoredLines(true, false);
     }
 }
@@ -198,18 +120,23 @@ controls.redoButton.onclick = function()
 {
     if (!isRewriting && deletedLines.length != 0)
     {
-        userData.storedLines.push(deletedLines.pop());
-    
-        rewriterContext.fillStyle = pageColour;
-        rewriterContext.fillRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
-        rewriterContext.drawImage(selectedBackground, 0, 0);
-
+        userData.storedLines.push(deletedLines.pop());    
         drawStoredLines(true, false);
     }
 }
+let controller = new AbortController();
+let signal = controller.signal;
 
-controls.rewriteButton.onclick = async function()
-{    
+controls.rewriteButton.onclick = async () => {    
+
+    controller.abort();
+    controller = new AbortController();
+    signal = controller.signal;
+    await rewrite(signal);
+}
+
+async function rewrite(signal = new AbortSignal()) {
+    
     if (isRewriting || !userData.storedLines.length) {
         return;
     }
@@ -225,19 +152,18 @@ controls.rewriteButton.onclick = async function()
     
     do 
     {
-        rewriterContext.strokeStyle = pageColour;
-        rewriterContext.fillRect(0, 0, controls.rewriterCanvas.width, controls.rewriterCanvas.height);
-        
         if (userData.userSettings.isTraceOn)
         {
-            await drawStoredLines(true, true);
+            await drawStoredLines(true, true, signal);
         }
 
-        rewriterContext.drawImage(selectedBackground, 0, 0);
+        await drawStoredLines(false, false, signal);
 
-        await drawStoredLines();
-        
         rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
+        
+        if (signal.aborted) {
+            break;
+        }
 
         if (userData.userSettings.isLoopOn)
         {
@@ -246,14 +172,23 @@ controls.rewriteButton.onclick = async function()
     } while (userData.userSettings.isLoopOn & isRewriting);
 
     isRewriting = false;
+    rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
+    await drawStoredLines(true, false, undefined);
 }
 
-async function drawStoredLines(instantDraw = false, traceDraw = false) {
-    for (let i = 0; i < userData.storedLines.length; i++)
-    {
-        for (let j = 0; j < userData.storedLines[i].length; j++)
-        {
+async function drawStoredLines(instantDraw = false, traceDraw = false, abortSignal = undefined) {
+    for (let i = 0; i < userData.storedLines.length; i++) {
+        if (abortSignal?.aborted) {
+            return;
+        }
+
+        for (let j = 0; j < userData.storedLines[i].length; j++) {
             rewriterMaskContext.clearRect(0, 0, controls.rewriterMaskCanvas.width, controls.rewriterMaskCanvas.height);
+            
+            if (abortSignal?.aborted) {
+                return;
+            }
+            
             rewriterContext.lineWidth = userData.storedLines[i][j].penOptions.width;
 
             const baseColour = userData.storedLines[i][j].penOptions.colour;
@@ -277,28 +212,16 @@ async function drawStoredLines(instantDraw = false, traceDraw = false) {
             if (!instantDraw) {
                 await new Promise(r => setTimeout(r, 50 / userData.userSettings.rewriteSpeed));
             }
+
+            if (abortSignal?.aborted) {
+                return;
+            }
         }
 
         if (!instantDraw) {
             await new Promise(r => setTimeout(r, 500 / userData.userSettings.rewriteSpeed));
         }
     }
-}
-
-controls.speedSlider.oninput = function()
-{
-    userData.userSettings.rewriteSpeed = controls.speedSlider.value * 1;
-    controls.writeSpeedText.textContent = "Write Speed: " + userData.userSettings.rewriteSpeed.toFixed(1);
-}
-
-controls.loopCheckbox.onchange = function()
-{
-    userData.userSettings.isLoopOn = controls.loopCheckbox.checked ?? false; 
-}
-
-controls.traceCheckbox.onchange = function()
-{
-    userData.userSettings.isTraceOn = controls.traceCheckbox.checked ?? false; 
 }
 
 controls.penCheckbox.onchange = function()
@@ -377,12 +300,12 @@ function drawStart(event) {
         }
 }
 
-document.addEventListener('touchend', event => 
+document.addEventListener('touchend', () => 
 {
     drawEnd();
 });
 
-document.addEventListener('mouseup', event => 
+document.addEventListener('mouseup', () => 
 {
     drawEnd();
 });

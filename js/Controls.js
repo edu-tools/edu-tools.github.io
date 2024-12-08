@@ -1,4 +1,4 @@
-import { PenImage } from "./enums.js";
+import { BackgroundImage, PenImage, PenWidth } from "./enums.js";
 import { UserData } from "./UserData.js";
 import * as utils from "./utils.js";
 
@@ -6,6 +6,7 @@ export class Controls {
 
     dateText;
 
+    rewriterPageCanvas;
     rewriterCanvas;
     rewriterMaskCanvas;
 
@@ -34,8 +35,10 @@ export class Controls {
     colourPickerCanvas;
 
     constructor(userData = new UserData()) {
+
         this.dateText = this.addControl("dateText", userData);
 
+        this.rewriterPageCanvas = this.addControl("writerPage", userData);
         this.rewriterCanvas = this.addControl("writer", userData);
         this.rewriterMaskCanvas = this.addControl("writerMask", userData);
 
@@ -79,15 +82,29 @@ export class Controls {
 
     initialiseControlsFromUserData(userData = new UserData()) {
         
-        this.speedSlider.value = userData.userSettings.rewriteSpeed;
-        this.writeSpeedText.textContent = "Write Speed: " + userData.userSettings.rewriteSpeed.toFixed(1);
+        this.initialiseSpeedSlider(userData);
         this.initialiseColourPicker(userData);
+        this.intialiseSelectedPage(userData);
         this.intialiseSelectedPenSize(userData);
-        // todo initialiseBackground
-        this.loopCheckbox.checked = userData.userSettings.isLoopOn == true;
+        this.initialiseCollapseButtons(userData);
+        this.initialiseLoopCheckbox(userData);
         this.traceCheckbox.checked = userData.userSettings.isTraceOn == true;
         this.penCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Marker;
         this.quillCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Quill;
+    }
+
+    initialiseSpeedSlider(userData = new UserData()) {
+        this.speedSlider.value = userData.userSettings.rewriteSpeed;
+        this.speedSlider.oninput = () => {
+            this.updateSpeedSlider(userData);
+        }
+
+        this.updateSpeedSlider(userData);
+    }
+
+    updateSpeedSlider(userData = new UserData()) {
+        userData.userSettings.rewriteSpeed = this.speedSlider.value * 1;
+        this.writeSpeedText.textContent = "Write Speed: " + userData.userSettings.rewriteSpeed.toFixed(1);
     }
 
     initialiseColourPicker(userData = new UserData()) {
@@ -110,6 +127,109 @@ export class Controls {
     }
 
     intialiseSelectedPenSize(userData = new UserData()) {
-        utils.updatePenWidthSelectedButton(this, userData);
+        
+        this.smallPenButton.addEventListener('click', () => {
+            userData.userSettings.selectedPenWidth = PenWidth.Small;
+            this.updatePenWidthSelectedButton(userData);
+        });
+        this.mediumPenButton.addEventListener('click', () => {
+            userData.userSettings.selectedPenWidth = PenWidth.Medium;
+            this.updatePenWidthSelectedButton(userData);
+        });
+        this.largePenButton.addEventListener('click', () => {
+            userData.userSettings.selectedPenWidth = PenWidth.Large;
+            this.updatePenWidthSelectedButton(userData);
+        });
+
+        this.updatePenWidthSelectedButton(userData);
+    }
+
+    updatePenWidthSelectedButton(userData = new UserData()) {
+        this.smallPenButton.classList.remove("pen-selected");
+        this.mediumPenButton.classList.remove("pen-selected");
+        this.largePenButton.classList.remove("pen-selected");
+        switch (userData.userSettings.selectedPenWidth) {
+            case PenWidth.Small:
+                this.smallPenButton.classList.add("pen-selected");
+                return;
+            case PenWidth.Medium:
+                this.mediumPenButton.classList.add("pen-selected");
+                return;
+            case PenWidth.Large:
+                this.largePenButton.classList.add("pen-selected");
+                return;
+        }
+    }
+
+    intialiseSelectedPage(userData = new UserData()) {
+        this.backgroundButton1.addEventListener('click', () => {
+            userData.userSettings.selectedBackground = BackgroundImage.BlueDottedLines;
+            this.updatePageSelectedButton(userData);
+        });
+        this.backgroundButton2.addEventListener('click', () => {
+            userData.userSettings.selectedBackground = BackgroundImage.GreyDottedLines;
+            this.updatePageSelectedButton(userData);
+        });
+        this.backgroundButton3.addEventListener('click', () => {
+            userData.userSettings.selectedBackground = BackgroundImage.RedBlueLines;
+            this.updatePageSelectedButton(userData);
+        });
+        this.backgroundButton4.addEventListener('click', () => {
+            userData.userSettings.selectedBackground = BackgroundImage.GreyLines;
+            this.updatePageSelectedButton(userData);
+        });
+
+        this.updatePageSelectedButton(userData);
+    }
+
+    updatePageSelectedButton(userData = new UserData()) {   
+        this.backgroundButton1.classList.remove("pen-selected");
+        this.backgroundButton2.classList.remove("pen-selected");
+        this.backgroundButton3.classList.remove("pen-selected");
+        this.backgroundButton4.classList.remove("pen-selected");
+        switch (userData.userSettings.selectedBackground) {
+            case BackgroundImage.BlueDottedLines:
+                this.backgroundButton1.classList.add("pen-selected");
+                return;
+            case BackgroundImage.GreyDottedLines:
+                this.backgroundButton2.classList.add("pen-selected");
+                return;
+            case BackgroundImage.RedBlueLines:
+                this.backgroundButton3.classList.add("pen-selected");
+                return;
+            case BackgroundImage.GreyLines:
+                this.backgroundButton4.classList.add("pen-selected");
+                return;
+        }
+    }
+
+    initialiseCollapseButtons(userData = new UserData()) {
+        this.collapsePenOptionsButton.addEventListener('click', () =>
+        {
+            document.querySelector('#penOptions').classList.toggle('collapse');
+            this.collapsePenOptionsButton.classList.toggle("collapse-button-collapsed");
+        });
+
+        this.collapsePageOptionsButton.addEventListener('click', () =>
+        {
+            document.querySelector('#pageOptions').classList.toggle('collapse');
+            this.collapsePageOptionsButton.classList.toggle("collapse-button-collapsed");
+        });
+    }
+
+    initialiseLoopCheckbox(userData = new UserData()) {
+        this.loopCheckbox.checked = userData.userSettings.isLoopOn == true;
+
+        this.loopCheckbox.onchange = () => {
+            userData.userSettings.isLoopOn = this.loopCheckbox.checked == true; 
+        }
+    }
+
+    initialiseTraceCheckbox(userData = new UserData()) {
+        this.traceCheckbox.checked = userData.userSettings.isTraceOn == true;
+
+        this.traceCheckbox.onchange = () => {
+            userData.userSettings.isTraceOn = this.traceCheckbox.checked == true; 
+        }
     }
 }

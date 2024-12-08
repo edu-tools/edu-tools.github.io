@@ -1,23 +1,3 @@
-import { PenWidth } from "./enums.js";
-
-export function updatePenWidthSelectedButton(controls = new Controls(), userData = new UserData()) 
-{
-    controls.smallPenButton.classList.remove("pen-selected");
-    controls.mediumPenButton.classList.remove("pen-selected");
-    controls.largePenButton.classList.remove("pen-selected");
-    switch (userData.userSettings.selectedPenWidth) {
-        case PenWidth.Small:
-            controls.smallPenButton.classList.add("pen-selected");
-            return;
-        case PenWidth.Medium:
-            controls.mediumPenButton.classList.add("pen-selected");
-            return;
-        case PenWidth.Large:
-            controls.largePenButton.classList.add("pen-selected");
-            return;
-    }
-}
-
 export function colourArrayToRGBString(colourArray) {
     return "rgb(" + colourArray[0] + "," + colourArray[1] + "," + colourArray[2] + ")";
 }

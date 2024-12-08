@@ -6,8 +6,9 @@ export const PenImage = {
 
 export const BackgroundImage = {
     BlueDottedLines: 'BlueDottedLines',
-    Marker: 'Marker',
-    Quill: 'Quill',
+    GreyDottedLines: 'GreyDottedLines',
+    RedBlueLines: 'RedBlueLines',
+    GreyLines: 'GreyLines',
 };
 
 export const PenWidth = {

@@ -3,10 +3,12 @@ import { PenImage, BackgroundImage, PenWidth } from "./enums.js";
 export class UserData {
     userSettings = new UserSettings();
     storedLines = [];
+    deletedLines = [];
 
-    constructor(userSettings = new UserSettings(), storedLines = []) {
+    constructor(userSettings = new UserSettings(), storedLines = [], deletedLines = []) {
         this.userSettings = userSettings;
         this.storedLines = storedLines;
+        this.deletedLines = deletedLines;
     }
 
     saveToLocalStorage() {

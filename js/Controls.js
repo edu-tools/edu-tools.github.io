@@ -16,18 +16,18 @@ export class Controls {
     rewriteButton;
     speedSlider;
     writeSpeedText;
-    loopCheckbox;
-    traceCheckbox;
     undoButton;
     redoButton;
     penCheckbox;
     quillCheckbox;
-    collapsePenOptionsButton;
-    collapsePageOptionsButton;
+    collapseLeftSidebarButton;
+    collapseRightSidebarButton;
 
     smallPenButton;
     mediumPenButton;
     largePenButton;
+    loopButton;
+    traceButton;
 
     backgroundButton1;
     backgroundButton2;
@@ -50,18 +50,19 @@ export class Controls {
         this.rewriteButton = this.addControl("rewriteButton", userData);
         this.speedSlider = this.addControl("speedSlider", userData);
         this.writeSpeedText = this.addControl("writeSpeedText", userData);
-        this.loopCheckbox = this.addControl("loopCheckbox", userData);
-        this.traceCheckbox = this.addControl("traceCheckbox", userData);
         this.undoButton = this.addControl("undoButton", userData);
         this.redoButton = this.addControl("redoButton", userData);
         this.penCheckbox = this.addControl("penCheckbox", userData);
         this.quillCheckbox = this.addControl("quillCheckbox", userData);
-        this.collapsePenOptionsButton = this.addControl("collapsePenOptions", userData);
-        this.collapsePageOptionsButton = this.addControl("collapsePageOptions", userData);
+        this.collapseLeftSidebarButton = this.addControl("collapseLeftSidebar", userData);
+        this.collapseRightSidebarButton = this.addControl("collapseRightSidebar", userData);
     
         this.smallPenButton = this.addControl("smallPenButton", userData);
         this.mediumPenButton = this.addControl("mediumPenButton", userData);
         this.largePenButton = this.addControl("largePenButton", userData);
+
+        this.loopButton = this.addControl("loopButton", userData);
+        this.traceButton = this.addControl("traceButton", userData);
     
         this.backgroundButton1 = this.addControl("backgroundButton1", userData);
         this.backgroundButton2 = this.addControl("backgroundButton2", userData);
@@ -73,6 +74,65 @@ export class Controls {
         this.initialiseControlsFromUserData(userData);
         
         this.dateText.innerHTML = utils.getDateDisplayText();
+
+        // TODO prototype for positioning options buttons
+        
+        let leftSidebarOptionsElement = document.getElementById("leftSidebarOptions");
+        let colourPickerButtonOptionsElement = document.getElementById("colourPickerButtonOptions");
+        let colourPickerButtonElement = document.getElementById("colourPickerButton");
+
+        let penPositionOptions = () => {
+            colourPickerButtonOptionsElement.style.left = leftSidebarOptionsElement.getBoundingClientRect().right + "px";
+            colourPickerButtonOptionsElement.style.top = colourPickerButtonElement.getBoundingClientRect().top + "px";
+        };
+
+        colourPickerButtonElement.addEventListener("click", () => {
+            if (colourPickerButtonOptionsElement.classList.contains("options-button-options-show")) {
+                colourPickerButtonOptionsElement.classList.remove("options-button-options-show");
+            }
+            else {
+                colourPickerButtonOptionsElement.classList.add("options-button-options-show");
+                penPositionOptions();
+            }            
+        });
+
+        
+        leftSidebarOptionsElement.addEventListener("scroll" , penPositionOptions);
+        window.addEventListener('resize', penPositionOptions);
+        
+        this.collapseLeftSidebarButton.addEventListener("click", () => {
+            if (colourPickerButtonOptionsElement.classList.contains("options-button-options-show")) {
+                colourPickerButtonOptionsElement.classList.remove("options-button-options-show");
+            }
+        });
+        
+        let pageOptionsElement = document.getElementById("rightSidebarOptions");
+        let testElement3 = document.getElementById("test3");
+        let buttonElement = document.getElementById("test2");
+
+        let pagePositionOptions = () => {
+            testElement3.style.left = pageOptionsElement.getBoundingClientRect().left - testElement3.getBoundingClientRect().width + "px";
+            testElement3.style.top = buttonElement.getBoundingClientRect().top + "px";
+        };
+
+        buttonElement.addEventListener("click", () => {
+            if (testElement3.classList.contains("options-button-options-show")) {
+                testElement3.classList.remove("options-button-options-show");
+            }
+            else {
+                testElement3.classList.add("options-button-options-show");
+                pagePositionOptions();
+            }            
+        });
+
+        pageOptionsElement.addEventListener("scroll" , pagePositionOptions);
+        window.addEventListener('resize', pagePositionOptions);
+
+        this.collapseRightSidebarButton.addEventListener("click", () => {
+            if (testElement3.classList.contains("options-button-options-show")) {
+                testElement3.classList.remove("options-button-options-show");
+            }
+        });
     }
 
     addControl(elementId = "", userData = new UserData()) {
@@ -91,10 +151,23 @@ export class Controls {
         this.intialiseSelectedPage(userData);
         this.intialiseSelectedPenSize(userData);
         this.initialiseCollapseButtons(userData);
-        this.initialiseLoopCheckbox(userData);
-        this.traceCheckbox.checked = userData.userSettings.isTraceOn == true;
+        this.initialiseLoopButton(userData);
+        this.initialiseTraceButton(userData);
         this.penCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Marker;
         this.quillCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Quill;
+        
+        const pageColour = utils.colourArrayToRGBString([240, 240, 240]); // TODO options
+        const backgroundImage = utils.BackgroundEnumToImage(userData.userSettings.selectedBackground);
+
+        backgroundImage.onload = () => {
+            const rewriterPageContext = this.rewriterPageCanvas.getContext('2d');
+            const rewriterLinesContext = this.rewriterLinesCanvas.getContext('2d');
+
+            rewriterPageContext.fillStyle = pageColour;
+            rewriterPageContext.fillRect(0, 0, this.rewriterPageCanvas.width, this.rewriterPageCanvas.height); 
+            rewriterLinesContext.clearRect(0, 0, this.rewriterPageCanvas.width, this.rewriterPageCanvas.height); 
+            rewriterLinesContext.drawImage(backgroundImage, 0, 0);
+        };
     }
 
     initialiseSpeedSlider(userData = new UserData()) {
@@ -208,32 +281,52 @@ export class Controls {
     }
 
     initialiseCollapseButtons(userData = new UserData()) {
-        this.collapsePenOptionsButton.addEventListener('click', () =>
+        this.collapseLeftSidebarButton.addEventListener('click', () =>
         {
-            document.querySelector('#penOptions').classList.toggle('collapse');
-            this.collapsePenOptionsButton.classList.toggle("collapse-button-collapsed");
+            document.querySelector('#leftSidebarOptions').classList.toggle('collapse');
+            this.collapseLeftSidebarButton.classList.toggle("collapse-button-collapsed");
         });
 
-        this.collapsePageOptionsButton.addEventListener('click', () =>
+        this.collapseRightSidebarButton.addEventListener('click', () =>
         {
-            document.querySelector('#pageOptions').classList.toggle('collapse');
-            this.collapsePageOptionsButton.classList.toggle("collapse-button-collapsed");
+            document.querySelector('#rightSidebarOptions').classList.toggle('collapse');
+            this.collapseRightSidebarButton.classList.toggle("collapse-button-collapsed");
         });
     }
 
-    initialiseLoopCheckbox(userData = new UserData()) {
-        this.loopCheckbox.checked = userData.userSettings.isLoopOn == true;
-
-        this.loopCheckbox.onchange = () => {
-            userData.userSettings.isLoopOn = this.loopCheckbox.checked == true; 
+    initialiseLoopButton(userData = new UserData()) {
+        
+        if (userData.userSettings.isLoopOn) {
+            this.loopButton.classList.add("pen-selected");
         }
+    
+        this.loopButton.addEventListener('click', () => {
+            userData.userSettings.isLoopOn = !userData.userSettings.isLoopOn;
+
+            this.loopButton.classList.remove("pen-selected");
+            if (userData.userSettings.isLoopOn) {
+                this.loopButton.classList.add("pen-selected");
+            }
+        });
     }
 
-    initialiseTraceCheckbox(userData = new UserData()) {
-        this.traceCheckbox.checked = userData.userSettings.isTraceOn == true;
-
-        this.traceCheckbox.onchange = () => {
-            userData.userSettings.isTraceOn = this.traceCheckbox.checked == true; 
+    initialiseTraceButton(userData = new UserData()) {
+        
+        if (userData.userSettings.isTraceOn) {
+            this.traceButton.classList.add("pen-selected");
         }
+            
+        this.traceButton.addEventListener('click', async () => {
+            userData.userSettings.isTraceOn = !userData.userSettings.isTraceOn;
+
+            this.traceButton.classList.remove("pen-selected");
+            if (userData.userSettings.isTraceOn) {
+                this.traceButton.classList.add("pen-selected");
+            }
+            const rewriterTraceContext = this.rewriterTraceCanvas.getContext('2d');
+            rewriterTraceContext.clearRect(0, 0, this.rewriterTraceCanvas.width, this.rewriterTraceCanvas.height)
+            // TODO move into controls
+            await drawStoredLines(rewriterTraceContext, true, true);
+        });
     }
 }

@@ -1,4 +1,4 @@
-import { BackgroundImage, PenImage, PenWidth } from "./enums.js";
+import { BackgroundImage, PageColour, PenImage, PenWidth } from "./enums.js";
 import { UserData } from "./UserData.js";
 import * as utils from "./utils.js";
 
@@ -26,6 +26,12 @@ export class Controls {
     smallPenButton;
     mediumPenButton;
     largePenButton;
+
+    whitePageButton;
+    peachPageButton;
+    yellowPageButton;
+    blueGreyPageButton;
+
     loopButton;
     traceButton;
 
@@ -60,6 +66,11 @@ export class Controls {
         this.smallPenButton = this.addControl("smallPenButton", userData);
         this.mediumPenButton = this.addControl("mediumPenButton", userData);
         this.largePenButton = this.addControl("largePenButton", userData);
+    
+        this.whitePageButton = this.addControl("whitePageButton", userData);
+        this.peachPageButton = this.addControl("peachPageButton", userData);
+        this.yellowPageButton = this.addControl("yellowPageButton", userData);
+        this.blueGreyPageButton = this.addControl("blueGreyPageButton", userData);
 
         this.loopButton = this.addControl("loopButton", userData);
         this.traceButton = this.addControl("traceButton", userData);
@@ -74,65 +85,6 @@ export class Controls {
         this.initialiseControlsFromUserData(userData);
         
         this.dateText.innerHTML = utils.getDateDisplayText();
-
-        // TODO prototype for positioning options buttons
-        
-        let leftSidebarOptionsElement = document.getElementById("leftSidebarOptions");
-        let colourPickerButtonOptionsElement = document.getElementById("colourPickerButtonOptions");
-        let colourPickerButtonElement = document.getElementById("colourPickerButton");
-
-        let penPositionOptions = () => {
-            colourPickerButtonOptionsElement.style.left = leftSidebarOptionsElement.getBoundingClientRect().right + "px";
-            colourPickerButtonOptionsElement.style.top = colourPickerButtonElement.getBoundingClientRect().top + "px";
-        };
-
-        colourPickerButtonElement.addEventListener("click", () => {
-            if (colourPickerButtonOptionsElement.classList.contains("options-button-options-show")) {
-                colourPickerButtonOptionsElement.classList.remove("options-button-options-show");
-            }
-            else {
-                colourPickerButtonOptionsElement.classList.add("options-button-options-show");
-                penPositionOptions();
-            }            
-        });
-
-        
-        leftSidebarOptionsElement.addEventListener("scroll" , penPositionOptions);
-        window.addEventListener('resize', penPositionOptions);
-        
-        this.collapseLeftSidebarButton.addEventListener("click", () => {
-            if (colourPickerButtonOptionsElement.classList.contains("options-button-options-show")) {
-                colourPickerButtonOptionsElement.classList.remove("options-button-options-show");
-            }
-        });
-        
-        let pageOptionsElement = document.getElementById("rightSidebarOptions");
-        let testElement3 = document.getElementById("test3");
-        let buttonElement = document.getElementById("test2");
-
-        let pagePositionOptions = () => {
-            testElement3.style.left = pageOptionsElement.getBoundingClientRect().left - testElement3.getBoundingClientRect().width + "px";
-            testElement3.style.top = buttonElement.getBoundingClientRect().top + "px";
-        };
-
-        buttonElement.addEventListener("click", () => {
-            if (testElement3.classList.contains("options-button-options-show")) {
-                testElement3.classList.remove("options-button-options-show");
-            }
-            else {
-                testElement3.classList.add("options-button-options-show");
-                pagePositionOptions();
-            }            
-        });
-
-        pageOptionsElement.addEventListener("scroll" , pagePositionOptions);
-        window.addEventListener('resize', pagePositionOptions);
-
-        this.collapseRightSidebarButton.addEventListener("click", () => {
-            if (testElement3.classList.contains("options-button-options-show")) {
-                testElement3.classList.remove("options-button-options-show");
-            }
-        });
     }
 
     addControl(elementId = "", userData = new UserData()) {
@@ -148,23 +100,54 @@ export class Controls {
         
         this.initialiseSpeedSlider(userData);
         this.initialiseColourPicker(userData);
-        this.intialiseSelectedPage(userData);
-        this.intialiseSelectedPenSize(userData);
+
+        // TODO clear this up
+        const leftSidebarOptionsElement = document.getElementById("leftSidebarOptions");
+        const rightSidebarOptionsElement = document.getElementById("rightSidebarOptions");
+                        
+        const penSizeOptionsButtonElement = document.getElementById("penSizeButton");
+        const penSizeOptionsElement = document.getElementById("penSizeButtonOptions");
+        const penSizeOptionButtonElementDataPairs = [
+            [this.smallPenButton, PenWidth.Small],
+            [this.mediumPenButton, PenWidth.Medium],
+            [this.largePenButton, PenWidth.Large],
+        ];
+        this.intialiseOptions(userData, "selectedPenWidth", leftSidebarOptionsElement, penSizeOptionsButtonElement, penSizeOptionsElement, penSizeOptionButtonElementDataPairs, false);
+
+        const backgroundOptionsButtonElement = document.getElementById("backgroundButton");
+        const backgroundOptionsElement = document.getElementById("backgroundButtonOptions");
+        const backgroundOptionButtonElementDataPairs = [
+            [this.backgroundButton1, BackgroundImage.BlueDottedLines],
+            [this.backgroundButton2, BackgroundImage.GreyDottedLines],
+            [this.backgroundButton3, BackgroundImage.RedBlueLines],
+            [this.backgroundButton4, BackgroundImage.GreyLines],
+        ];
+        this.intialiseOptions(userData, "selectedBackground", rightSidebarOptionsElement, backgroundOptionsButtonElement, backgroundOptionsElement, backgroundOptionButtonElementDataPairs, true);
+
+        const pageColourOptionsButtonElement = document.getElementById("pageColourButton");
+        const pageColourOptionsElement = document.getElementById("pageColourButtonOptions");
+        const pageColourOptionButtonElementDataPairs = [
+            [this.whitePageButton, PageColour.White],
+            [this.peachPageButton, PageColour.Peach],
+            [this.yellowPageButton, PageColour.Yellow],
+            [this.blueGreyPageButton, PageColour.BlueGrey],
+        ];
+        this.intialiseOptions(userData, "selectedPageColour", rightSidebarOptionsElement, pageColourOptionsButtonElement, pageColourOptionsElement, pageColourOptionButtonElementDataPairs, true);
+
         this.initialiseCollapseButtons(userData);
         this.initialiseLoopButton(userData);
         this.initialiseTraceButton(userData);
         this.penCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Marker;
         this.quillCheckbox.checked = userData.userSettings.selectedPenImage == PenImage.Quill;
         
-        const pageColour = utils.colourArrayToRGBString([240, 240, 240]); // TODO options
         const backgroundImage = utils.BackgroundEnumToImage(userData.userSettings.selectedBackground);
 
         backgroundImage.onload = () => {
             const rewriterPageContext = this.rewriterPageCanvas.getContext('2d');
-            const rewriterLinesContext = this.rewriterLinesCanvas.getContext('2d');
+            rewriterPageContext.fillStyle = userData.userSettings.selectedPageColour;
+            rewriterPageContext.fillRect(0, 0, this.rewriterPageCanvas.width, this.rewriterPageCanvas.height);
 
-            rewriterPageContext.fillStyle = pageColour;
-            rewriterPageContext.fillRect(0, 0, this.rewriterPageCanvas.width, this.rewriterPageCanvas.height); 
+            const rewriterLinesContext = this.rewriterLinesCanvas.getContext('2d');
             rewriterLinesContext.clearRect(0, 0, this.rewriterPageCanvas.width, this.rewriterPageCanvas.height); 
             rewriterLinesContext.drawImage(backgroundImage, 0, 0);
         };
@@ -203,80 +186,75 @@ export class Controls {
         });
     }
 
-    intialiseSelectedPenSize(userData = new UserData()) {
-        
-        this.smallPenButton.addEventListener('click', () => {
-            userData.userSettings.selectedPenWidth = PenWidth.Small;
-            this.updatePenWidthSelectedButton(userData);
-        });
-        this.mediumPenButton.addEventListener('click', () => {
-            userData.userSettings.selectedPenWidth = PenWidth.Medium;
-            this.updatePenWidthSelectedButton(userData);
-        });
-        this.largePenButton.addEventListener('click', () => {
-            userData.userSettings.selectedPenWidth = PenWidth.Large;
-            this.updatePenWidthSelectedButton(userData);
-        });
+    updateOptionsButton(userDataSetting, optionsButton, buttonDataPairs) {
 
-        this.updatePenWidthSelectedButton(userData);
-    }
+        let buttonImage;
 
-    updatePenWidthSelectedButton(userData = new UserData()) {
-        this.smallPenButton.classList.remove("pen-selected");
-        this.mediumPenButton.classList.remove("pen-selected");
-        this.largePenButton.classList.remove("pen-selected");
-        switch (userData.userSettings.selectedPenWidth) {
-            case PenWidth.Small:
-                this.smallPenButton.classList.add("pen-selected");
-                return;
-            case PenWidth.Medium:
-                this.mediumPenButton.classList.add("pen-selected");
-                return;
-            case PenWidth.Large:
-                this.largePenButton.classList.add("pen-selected");
-                return;
+        for (const buttonDataPair of buttonDataPairs) {
+            buttonDataPair[0].classList.remove("option-selected");
+
+            if (userDataSetting == buttonDataPair[1]) {
+                buttonDataPair[0].classList.add("option-selected");
+                buttonImage = buttonDataPair[0].getElementsByTagName('img')[0];
+            }
+        }
+
+        if (buttonImage) {
+            const optionsButtonImage = optionsButton.getElementsByTagName('img')[0];
+            optionsButtonImage.src = buttonImage.src;
         }
     }
 
-    intialiseSelectedPage(userData = new UserData()) {
-        this.backgroundButton1.addEventListener('click', () => {
-            userData.userSettings.selectedBackground = BackgroundImage.BlueDottedLines;
-            this.updatePageSelectedButton(userData);
-        });
-        this.backgroundButton2.addEventListener('click', () => {
-            userData.userSettings.selectedBackground = BackgroundImage.GreyDottedLines;
-            this.updatePageSelectedButton(userData);
-        });
-        this.backgroundButton3.addEventListener('click', () => {
-            userData.userSettings.selectedBackground = BackgroundImage.RedBlueLines;
-            this.updatePageSelectedButton(userData);
-        });
-        this.backgroundButton4.addEventListener('click', () => {
-            userData.userSettings.selectedBackground = BackgroundImage.GreyLines;
-            this.updatePageSelectedButton(userData);
+    initialiseOptions(sidebarOptionsElementId = "", buttonElementId = "", buttonOptionsElementId = "", optionsToTheLeft = false, otherCollapseTriggerElements = []) {
+        let sidebarOptionsElement = document.getElementById(sidebarOptionsElementId);
+
+        let buttonElement = document.getElementById(buttonElementId);
+        let buttonOptionsElement = document.getElementById(buttonOptionsElementId);
+
+        let repositionOptions = () => {
+            if (optionsToTheLeft) {
+                buttonOptionsElement.style.left = sidebarOptionsElement.getBoundingClientRect().left - buttonOptionsElement.getBoundingClientRect().width + "px";
+            }
+            else {
+                buttonOptionsElement.style.left = sidebarOptionsElement.getBoundingClientRect().right + "px";
+            }
+
+            buttonOptionsElement.style.top = buttonElement.getBoundingClientRect().top + "px";
+        };
+
+        buttonElement.addEventListener("click", () => {
+            if (buttonOptionsElement.classList.contains("options-button-options-show")) {
+                buttonOptionsElement.classList.remove("options-button-options-show");
+            }
+            else {
+                buttonOptionsElement.classList.add("options-button-options-show");
+                repositionOptions();
+            }            
         });
 
-        this.updatePageSelectedButton(userData);
+        sidebarOptionsElement.addEventListener("scroll" , repositionOptions);
+        window.addEventListener('resize', repositionOptions);
+        
+        for (const collapseTriggerElement of otherCollapseTriggerElements) {
+            collapseTriggerElement.addEventListener("click", () => {
+                if (buttonOptionsElement.classList.contains("options-button-options-show")) {
+                    buttonOptionsElement.classList.remove("options-button-options-show");
+                }
+            });
+        }
+
     }
 
-    updatePageSelectedButton(userData = new UserData()) {   
-        this.backgroundButton1.classList.remove("pen-selected");
-        this.backgroundButton2.classList.remove("pen-selected");
-        this.backgroundButton3.classList.remove("pen-selected");
-        this.backgroundButton4.classList.remove("pen-selected");
-        switch (userData.userSettings.selectedBackground) {
-            case BackgroundImage.BlueDottedLines:
-                this.backgroundButton1.classList.add("pen-selected");
-                return;
-            case BackgroundImage.GreyDottedLines:
-                this.backgroundButton2.classList.add("pen-selected");
-                return;
-            case BackgroundImage.RedBlueLines:
-                this.backgroundButton3.classList.add("pen-selected");
-                return;
-            case BackgroundImage.GreyLines:
-                this.backgroundButton4.classList.add("pen-selected");
-                return;
+    intialiseOptions(userData = new UserData(), userSettingsKey, sidebarOptionsElement, optionsButtonElement, optionsElement, optionButtonElementDataPairs, isLeftOrientedOptions) {
+
+        this.updateOptionsButton(userData.userSettings[userSettingsKey], optionsButtonElement, optionButtonElementDataPairs);
+        this.initialiseOptions(sidebarOptionsElement.id, optionsButtonElement.id, optionsElement.id, isLeftOrientedOptions, [this.collapseRightSidebarButton]);
+
+        for (const optionButtonElementDataPair of optionButtonElementDataPairs) {
+            optionButtonElementDataPair[0].addEventListener('click', () => {
+                userData.userSettings[userSettingsKey] = optionButtonElementDataPair[1];
+                this.updateOptionsButton(userData.userSettings[userSettingsKey], optionsButtonElement, optionButtonElementDataPairs);
+            });
         }
     }
 
@@ -297,15 +275,15 @@ export class Controls {
     initialiseLoopButton(userData = new UserData()) {
         
         if (userData.userSettings.isLoopOn) {
-            this.loopButton.classList.add("pen-selected");
+            this.loopButton.classList.add("option-selected");
         }
     
         this.loopButton.addEventListener('click', () => {
             userData.userSettings.isLoopOn = !userData.userSettings.isLoopOn;
 
-            this.loopButton.classList.remove("pen-selected");
+            this.loopButton.classList.remove("option-selected");
             if (userData.userSettings.isLoopOn) {
-                this.loopButton.classList.add("pen-selected");
+                this.loopButton.classList.add("option-selected");
             }
         });
     }
@@ -313,15 +291,15 @@ export class Controls {
     initialiseTraceButton(userData = new UserData()) {
         
         if (userData.userSettings.isTraceOn) {
-            this.traceButton.classList.add("pen-selected");
+            this.traceButton.classList.add("option-selected");
         }
             
         this.traceButton.addEventListener('click', async () => {
             userData.userSettings.isTraceOn = !userData.userSettings.isTraceOn;
 
-            this.traceButton.classList.remove("pen-selected");
+            this.traceButton.classList.remove("option-selected");
             if (userData.userSettings.isTraceOn) {
-                this.traceButton.classList.add("pen-selected");
+                this.traceButton.classList.add("option-selected");
             }
             const rewriterTraceContext = this.rewriterTraceCanvas.getContext('2d');
             rewriterTraceContext.clearRect(0, 0, this.rewriterTraceCanvas.width, this.rewriterTraceCanvas.height)

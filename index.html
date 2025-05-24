@@ -28,8 +28,11 @@
   
   <body>
     <div class="title-container">
-      <h1 class="title-text">Handwriting Repeater</h1>
-      <h1 class="date-text" id="dateText">DATE</h1>
+      <img src="/images/favicon.svg" id="titleIcon">
+      <div class="title-texts">
+        <h1 class="title-text">Handwriting Repeater</h1>
+        <h1 class="date-text" id="dateText">DATE</h1>
+      </div>
     </div>
     <div class="main-container disable-select">
       <div class="writer-container">
@@ -72,18 +75,16 @@
         <div class="sidebars">
           <div class="sidebar-left" id="sidebarLeft">
               <div class="sidebar-options" id="leftSidebarOptions">
-                <button class="icon-button" id="smallPenButton"><img src="/images/penSmallIcon.svg"/><span>Small Pen</span></button>
-                <button class="icon-button" id="mediumPenButton"><img src="/images/penMediumIcon.svg"/><span>Medium Pen</span></button>
-                <button class="icon-button" id="largePenButton"><img src="/images/penLargeIcon.svg"/><span>Large Pen</span></button>
+
+                <button class="icon-button" id="penSizeButton"><img src="/images/penSmallIcon.svg"/><span>Pen Size</span></button>
+                <div class="options-button-options" id="penSizeButtonOptions">
+                  <button class="icon-button" id="smallPenButton"><img src="/images/penSmallIcon.svg"/><span>Small</span></button>
+                  <button class="icon-button" id="mediumPenButton"><img src="/images/penMediumIcon.svg"/><span>Medium</span></button>
+                  <button class="icon-button" id="largePenButton"><img src="/images/penLargeIcon.svg"/><span>Large</span></button>
+                </div>
+
                 <button class="icon-button" id="loopButton"><img src="/images/colourPickerIcon.svg"/><span>Loop On</span></button>
                 <button class="icon-button" id="traceButton"><img src="/images/colourPickerIcon.svg"/><span>Trace On</span></button>
-                
-                <button class="icon-button" id="colourPickerButton"><img src="/images/colourPickerIcon.svg"/><span>Colour Picker</span>
-                </button>
-                <div class="options-button-options" id="colourPickerButtonOptions">
-                  <button class="icon-button" id="colourPickerOption1"><img src="/images/colourPickerIcon.svg"/><span>Option 1</span></button>
-                  <button class="icon-button" id="colourPickerOption2"><img src="/images/colourPickerIcon.svg"/><span>Option 2</span></button>
-                </div>
                 
                 <button class="icon-button" id="1"><img src="/images/colourPickerIcon.svg"/><span>Button 1</span></button>
                 <button class="icon-button" id="2"><img src="/images/colourPickerIcon.svg"/><span>Button 2</span></button>
@@ -95,16 +96,21 @@
           </div>
           <div class="sidebar-right">
               <div class="sidebar-options" id="rightSidebarOptions">
-                <button class="icon-button" id="backgroundButton1"><img src="/images/colourPickerIcon.svg"/><span>Background 1</span></button>
-                <button class="icon-button" id="backgroundButton2"><img src="/images/colourPickerIcon.svg"/><span>Background 2</span></button>
-                <button class="icon-button" id="backgroundButton3"><img src="/images/colourPickerIcon.svg"/><span>Background 3</span></button>
-                <button class="icon-button" id="backgroundButton4"><img src="/images/colourPickerIcon.svg"/><span>Background 4</span></button>
-
                 
-                <button class="icon-button" id="test2"><img src="/images/colourPickerIcon.svg"/><span>Colour Picker</span></button>
-                <div class="options-button-options" id="test3">
-                  <button class="icon-button" id="colourPickerOption3"><img src="/images/colourPickerIcon.svg"/><span>Option 1</span></button>
-                  <button class="icon-button" id="colourPickerOption4"><img src="/images/colourPickerIcon.svg"/><span>Option 2</span></button>
+                <button class="icon-button" id="backgroundButton"><img src="/images/penSmallIcon.svg"/><span>Page Lines</span></button>
+                <div class="options-button-options" id="backgroundButtonOptions">
+                  <button class="icon-button" id="backgroundButton1"><img src="/images/colourPickerIcon.svg"/><span>Background 1</span></button>
+                  <button class="icon-button" id="backgroundButton2"><img src="/images/colourPickerIcon.svg"/><span>Background 2</span></button>
+                  <button class="icon-button" id="backgroundButton3"><img src="/images/colourPickerIcon.svg"/><span>Background 3</span></button>
+                  <button class="icon-button" id="backgroundButton4"><img src="/images/colourPickerIcon.svg"/><span>Background 4</span></button>
+                </div>
+
+                <button class="icon-button" id="pageColourButton"><img src="/images/penSmallIcon.svg"/><span>Page Colour</span></button>
+                <div class="options-button-options" id="pageColourButtonOptions">
+                  <button class="icon-button" id="whitePageButton"><img src="/images/colourPickerIcon.svg"/><span>White</span></button>
+                  <button class="icon-button" id="peachPageButton"><img src="/images/colourPickerIcon.svg"/><span>Peach</span></button>
+                  <button class="icon-button" id="yellowPageButton"><img src="/images/colourPickerIcon.svg"/><span>Yellow</span></button>
+                  <button class="icon-button" id="blueGreyPageButton"><img src="/images/colourPickerIcon.svg"/><span>Blue Grey</span></button>
                 </div>
               </div>
               <button id="collapseRightSidebar"></button>

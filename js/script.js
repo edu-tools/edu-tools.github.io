@@ -4,7 +4,7 @@ import { Point } from "./Point.js";
 import { DrawnLine } from "./DrawnLine.js";
 import { PenOptions } from "./PenOptions.js";
 import * as utils from "./utils.js";
-import { BackgroundImage, PenImage } from "./enums.js";
+import { BackgroundImage, PageColour, PenImage } from "./enums.js";
 
 const userData = new UserData();
 userData.loadFromLocalStorage();
@@ -14,6 +14,8 @@ const controls = new Controls(userData);
 var rewriterTraceContext = controls.rewriterTraceCanvas.getContext('2d');
 var rewriterLinesContext = controls.rewriterLinesCanvas.getContext('2d');
 var rewriterContext = controls.rewriterCanvas.getContext('2d');
+const rewriterPageContext = controls.rewriterPageCanvas.getContext('2d');
+            
 rewriterContext.lineCap = "round";
 var rewriterMaskContext = controls.rewriterMaskCanvas.getContext('2d');
 
@@ -41,6 +43,7 @@ function resetcanvasWriter()
     userData.deletedLines = [];
 }
 
+// TODO move to controls
 controls.backgroundButton1.onclick = function()
 {
     userData.userSettings.selectedBackground = BackgroundImage.BlueDottedLines;
@@ -64,6 +67,32 @@ controls.backgroundButton4.onclick = function()
     userData.userSettings.selectedBackground = BackgroundImage.GreyLines;
     rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
     rewriterLinesContext.drawImage(utils.BackgroundEnumToImage(userData.userSettings.selectedBackground), 0, 0);
+}
+
+
+controls.whitePageButton.onclick = function()
+{
+    userData.userSettings.selectedPageColour = PageColour.White;
+    rewriterPageContext.fillStyle = userData.userSettings.selectedPageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height);
+}
+controls.peachPageButton.onclick = function()
+{
+    userData.userSettings.selectedPageColour = PageColour.Peach;
+    rewriterPageContext.fillStyle = userData.userSettings.selectedPageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height);
+}
+controls.yellowPageButton.onclick = function()
+{
+    userData.userSettings.selectedPageColour = PageColour.Yellow;
+    rewriterPageContext.fillStyle = userData.userSettings.selectedPageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height);
+}
+controls.blueGreyPageButton.onclick = function()
+{
+    userData.userSettings.selectedPageColour = PageColour.BlueGrey;
+    rewriterPageContext.fillStyle = userData.userSettings.selectedPageColour;
+    rewriterPageContext.fillRect(0, 0, controls.rewriterPageCanvas.width, controls.rewriterPageCanvas.height);
 }
 
 // Bottom controls
@@ -110,6 +139,7 @@ async function rewrite(signal = new AbortSignal()) {
         'loop_on': userData.userSettings.isLoopOn,
         'trace_on': userData.userSettings.isTraceOn,
         'selected_background': userData.userSettings.selectedBackground,
+        'selected_page_colour': userData.userSettings.selectedPageColour,
         'selected_pen_image': userData.userSettings.selectedPenImage,
         'write_speed_multiplier': userData.userSettings.rewriteSpeed
     });

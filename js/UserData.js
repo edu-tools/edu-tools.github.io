@@ -1,4 +1,4 @@
-import { PenImage, BackgroundImage, PenWidth } from "./enums.js";
+import { PenImage, BackgroundImage, PenWidth, PageColour } from "./enums.js";
 
 export class UserData {
     userSettings = new UserSettings();
@@ -45,6 +45,7 @@ class UserSettings {
     selectedPenColour = [0, 0, 0];
     selectedPenWidth = PenWidth.Medium;
     selectedBackground = BackgroundImage.BlueDottedLines;
+    selectedPageColour = PageColour.White;
     rewriteSpeed = 2;
 }
 

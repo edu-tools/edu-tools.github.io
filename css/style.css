@@ -14,19 +14,34 @@ body {
 
 .title-container {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding-top: 1vh;
     padding-bottom: 2vh;
     margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
     background-color: royalblue;
     white-space: nowrap;
 }
 
+#titleIcon {
+    padding-left: 10px;
+    width: 0px;
+    /* TODO */
+}
+
+.title-texts {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    color: white;
+    align-items: center;
+    align-self: center;
+}
+
 .title-text {
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 1000;
+    letter-spacing: 0.1em;
     color: white;
     text-shadow: 0.1em 0.1em blue;
     font-size: 2.5vw;
@@ -34,11 +49,12 @@ body {
 }
 
 .date-text {
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 1000;
+    letter-spacing: 0.1em;
     color: rgb(255, 208, 0);
     text-shadow: 0.1em 0.1em black;
     font-size: 1.3vw;
-    text-decoration: underline;
     text-decoration-skip-ink: none;
 }
 
@@ -48,15 +64,16 @@ button {
     border-radius: 10px;
     color: white;
     text-shadow: 0.1em 0.1em blue;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 1000;
+    letter-spacing: 0.025em;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 20px;
     outline: none;
     cursor: pointer;
-    overflow: hidden;
+    /* overflow: hidden; TODO do we want this? */
     scale: 1;
     box-shadow: 0px 0px 0px 0px #666;
     transition: all 100ms ease;
@@ -253,12 +270,11 @@ button:hover {
     display: flex;
     align-items: center;
     padding-block: 30px;
-    text-overflow: clip;
     width: 100%;
     border-radius: 0px 0px 0px 0px;
 }
 
-.pen-selected {
+.option-selected {
     text-decoration: underline;
     background-color: royalblue;
 }
@@ -374,9 +390,10 @@ button:hover {
 }
 
 #writeSpeedText {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 1000;
+    letter-spacing: 0.025em;
     font-size: 2vh;
-    font-weight: bold;
     color: blue;
     text-shadow: 0.1em 0.1em white;
     margin-top: 15px;
@@ -427,8 +444,9 @@ button:hover {
     align-items: center;
     width: 100%;
     justify-content: flex-end;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
+    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: 1000;
+    letter-spacing: 0.025em;
     font-size: calc(12px + 0.2vw);
     text-shadow: 0.1em 0.1em white;   
     color: blue;

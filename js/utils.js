@@ -16,6 +16,8 @@ let redBlueLineImage = new Image();
 redBlueLineImage.src = "images/red-blue-lines.png";
 let greyDottedLineImage = new Image();
 greyDottedLineImage.src = "images/grey-dotted-lines.png";
+let earthImage = new Image();
+earthImage.src = "images/ground-lines.png";
 
 export function BackgroundEnumToImage(backgroundImage = BackgroundImage.BlueDottedLines) {
     switch (backgroundImage) {
@@ -25,21 +27,28 @@ export function BackgroundEnumToImage(backgroundImage = BackgroundImage.BlueDott
             return redBlueLineImage;
         case BackgroundImage.GreyDottedLines:
             return greyDottedLineImage;
+        case BackgroundImage.Earth:
+            return earthImage;
     }
         
     return blueLineImage;
 }
 
-let quillImage = new Image();
-quillImage.src = "images/quill.svg";
-
 let markerImage = new Image();
 markerImage.src = "images/pen.svg";
+
+let pencilImage = new Image();
+pencilImage.src = "images/pencil.svg";
+
+let quillImage = new Image();
+quillImage.src = "images/quill.svg";
 
 export function PenEnumToImage(penImage = PenImage.None) {
     switch (penImage) {
         case PenImage.Marker:
             return markerImage;
+        case PenImage.Pencil:
+            return pencilImage;
         case PenImage.Quill:
             return quillImage;
     }

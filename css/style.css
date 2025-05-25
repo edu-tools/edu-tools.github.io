@@ -5,6 +5,7 @@
 
 
 body {
+    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -18,14 +19,16 @@ body {
     justify-content: space-between;
     padding-top: 1vh;
     padding-bottom: 2vh;
-    margin-bottom: 20px;
+    margin-bottom: 60px;
     background-color: royalblue;
     white-space: nowrap;
+    height: 150px;
 }
 
 #titleIcon {
-    padding-left: 10px;
-    width: 0px;
+    position: absolute;
+    padding-left: 2vw;
+    width: 100px;
     /* TODO */
 }
 
@@ -39,7 +42,6 @@ body {
 }
 
 .title-text {
-    font-family:"ABeeZee", Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 1000;
     letter-spacing: 0.1em;
     color: white;
@@ -258,7 +260,6 @@ button:hover {
     display: none;
     position: fixed;
     background-color: rgb(183, 208, 255, 0.5);
-    outline: solid 2px rgb(0, 0, 255, 0.5);
     z-index: 9999;
 }
 
@@ -276,6 +277,10 @@ button:hover {
 
 .option-selected {
     text-decoration: underline;
+    background-color: royalblue;
+}
+
+.options-button-selected {
     background-color: royalblue;
 }
 
@@ -400,7 +405,7 @@ button:hover {
 }
 
 .colour-picker-container {
-    display: flex;
+    display: none;
     width: fit-content;
     justify-content: center;
     align-self: center;

@@ -41,9 +41,9 @@ export class UserData {
 class UserSettings {
     isLoopOn = false;
     isTraceOn = false;
-    selectedPenImage = PenImage;
     selectedPenColour = [0, 0, 0];
     selectedPenWidth = PenWidth.Medium;
+    selectedPenImage = PenImage.Marker;
     selectedBackground = BackgroundImage.BlueDottedLines;
     selectedPageColour = PageColour.White;
     rewriteSpeed = 2;

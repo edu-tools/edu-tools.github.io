@@ -1,6 +1,7 @@
 export const PenImage = {
     None: 'None',
     Marker: 'Marker',
+    Pencil: 'Pencil',
     Quill: 'Quill',
 };
 
@@ -9,12 +10,13 @@ export const BackgroundImage = {
     GreyDottedLines: 'GreyDottedLines',
     RedBlueLines: 'RedBlueLines',
     GreyLines: 'GreyLines',
+    Earth: 'Earth',
 };
 
 export const PageColour = {
     White: 'rgb(240, 240, 240)',
     Peach: 'rgb(255, 221, 153)',
-    Yellow: 'rgb(255, 255, 153)',
+    Yellow: 'rgb(247, 247, 198)',
     BlueGrey: 'rgb(224, 228, 244)',
 };
 

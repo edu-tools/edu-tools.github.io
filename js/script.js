@@ -44,30 +44,6 @@ function resetcanvasWriter()
 }
 
 // TODO move to controls
-controls.backgroundButton1.onclick = function()
-{
-    userData.userSettings.selectedBackground = BackgroundImage.BlueDottedLines;
-    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
-    rewriterLinesContext.drawImage(utils.BackgroundEnumToImage(userData.userSettings.selectedBackground), 0, 0);
-}
-controls.backgroundButton2.onclick = function()
-{
-    userData.userSettings.selectedBackground = BackgroundImage.GreyDottedLines;
-    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
-    rewriterLinesContext.drawImage(utils.BackgroundEnumToImage(userData.userSettings.selectedBackground), 0, 0);
-}
-controls.backgroundButton3.onclick = function()
-{
-    userData.userSettings.selectedBackground = BackgroundImage.RedBlueLines;
-    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
-    rewriterLinesContext.drawImage(utils.BackgroundEnumToImage(userData.userSettings.selectedBackground), 0, 0);
-}
-controls.backgroundButton4.onclick = function()
-{
-    userData.userSettings.selectedBackground = BackgroundImage.GreyLines;
-    rewriterLinesContext.clearRect(0, 0, controls.rewriterLinesCanvas.width, controls.rewriterLinesCanvas.height); 
-    rewriterLinesContext.drawImage(utils.BackgroundEnumToImage(userData.userSettings.selectedBackground), 0, 0);
-}
 
 
 controls.whitePageButton.onclick = function()
@@ -227,32 +203,6 @@ async function drawStoredLines(ctx, instantDraw = false, traceDraw = false, abor
         if (!instantDraw) {
             await new Promise(r => setTimeout(r, 500 / userData.userSettings.rewriteSpeed));
         }
-    }
-}
-
-controls.penCheckbox.onchange = function()
-{
-    if (controls.penCheckbox.checked)
-    {
-        userData.userSettings.selectedPenImage = PenImage.Marker;
-        controls.quillCheckbox.checked = false;
-    }
-    else 
-    {
-        userData.userSettings.selectedPenImage = PenImage.None;
-    }
-}
-
-controls.quillCheckbox.onchange = function()
-{
-    if (controls.quillCheckbox.checked)
-    {
-        userData.userSettings.selectedPenImage = PenImage.Quill;
-        controls.penCheckbox.checked = false;
-    }
-    else 
-    {
-        userData.userSettings.selectedPenImage = PenImage.None;
     }
 }
 

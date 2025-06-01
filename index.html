@@ -80,6 +80,19 @@
     </div>
 
     <script src="script.js"></script>
+
+    <div class="footer-banner" id="footerBanner">
+      <img src="/logo.svg" width="50px"/>
+      <span>We're moving site! Come and check out our new redesign - with all the features you already love and more: <a href="https://handwritingrepeater.app/" target="_blank">https://handwritingrepeater.app</a></span>
+      <button class="footer-close" onclick="closeFooter()">Close</button>
+    </div>
+
+    <script>
+      function closeFooter() {
+        document.getElementById('footerBanner').classList.add('footer-hidden');
+      }
+    </script>
+
   </body>
 
 </html>

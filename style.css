@@ -43,6 +43,17 @@ body {
     text-decoration-skip-ink: none;
 }
 
+#qrLink {
+    position: absolute;
+    right: 2vw;
+}
+
+#qrIcon {
+    width: 5.5vw;
+    border-radius: 10px;
+    /* TODO */
+}
+
 button {
     background-color: royalblue; /* Green */
     border: solid 2px rgb(0, 0, 255);

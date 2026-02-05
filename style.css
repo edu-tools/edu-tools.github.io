@@ -281,34 +281,61 @@ button:active {
    -ms-user-select: none; /* Internet Explorer/Edge */
 }
 
+#footerTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .footer-banner {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  flex-direction: column;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 90%;
   overflow-x: hidden;
   background-color: rgb(0, 0, 0, 0.8);
   color: rgb(255, 255, 255);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 50px;
   align-items: center;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  padding-block: 2vh;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   text-decoration: none;
-  font-size: 1.2vw;  
+  font-size: 20px;  
+  pointer-events: all;
+  border: solid 2px rgb(0, 0, 255);
+  border-radius: 10px;
+}
+
+
+.footer-banner img {
+    width: 20vh;
 }
 
 .footer-banner a {
   color: rgb(193, 186, 252);
+  font-size: 40px;
   font-weight: bold;
   text-decoration: underline;
 }
 
+.footer-banner span {
+    align-self: center;
+}
+
 .footer-close {
+  height: 100px;
+  width: 200px;
+  margin: 50px;
   padding: 5px 15px;
+  font-size: 20px;
 }
 
 .footer-close:hover {
